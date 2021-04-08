@@ -1,0 +1,41 @@
+resources:
+  - name: di-auth-oidc-provider
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/alphagov/di-auth-oidc-provider.git
+      ignore_paths:
+        - ci/pipeline.yaml
+      branch: bau-pipeline-setup
+
+  - name: pipeline-src
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/alphagov/di-auth-oidc-provider.git
+      paths:
+        - ci/pipeline.yaml
+      branch: bau-pipeline-setup
+
+jobs:
+  - name: update-pipeline
+    plan:
+      - get: pipeline-src
+        trigger: true
+      - set_pipeline: di-auth-oidc-provider
+        file: pipeline-src/ci/pipeline.yaml
+  
+  - name: deploy-app
+    plan:
+    - get: di-auth-oidc-provider
+      trigger: true
+    - task: simple-task
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source: { repository: busybox }
+        run:
+          path: echo
+          args: ["Hello world!"]
+
