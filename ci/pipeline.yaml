@@ -6,7 +6,7 @@ resources:
       uri: https://github.com/alphagov/di-auth-oidc-provider.git
       ignore_paths:
         - ci/pipeline.yaml
-      branch: bau-pipeline-setup
+      branch: main
 
   - name: pipeline-src
     type: git
@@ -15,7 +15,17 @@ resources:
       uri: https://github.com/alphagov/di-auth-oidc-provider.git
       paths:
         - ci/pipeline.yaml
-      branch: bau-pipeline-setup
+      branch: main
+
+  - name: di-auth-oidc-provider-upload
+    type: cf-cli
+    icon: cloud-upload
+    source:
+      api: https://api.cloud.service.gov.uk
+      username: ida-operations+paas-build-bot@digital.cabinet-office.gov.uk
+      password: ((cf-password))
+      org: gds-digital-identity-authentication
+      space: sandbox
 
 jobs:
   - name: update-pipeline
@@ -38,4 +48,30 @@ jobs:
         run:
           path: echo
           args: ["Hello world!"]
+    - task: build
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: gradle
+            tag: 6.7.0-jdk15@sha256:dc1a34c3ee9cadcd58e7f4582e7340cbeb2895ea3065f1569ad2f7831bf42e29
+        inputs:
+          - name: di-auth-oidc-provider
+        outputs:
+          - name: di-auth-oidc-provider
+        run:
+          path: /bin/bash
+          args:
+            - -euc
+            - |
+              cd di-auth-oidc-provider
+              gradle --no-daemon build
+              cp di-auth-oidc-provider/build/distributions/di-auth-oidc-provider.zip ../di-auth-oidc-provider/
+        - put: di-auth-oidc-provider-upload
+          params:
+            command: push
+            manifest: di-auth-oidc-provider/manifest.yml
+            path: di-auth-oidc-provider/di-auth-oidc-provider.zip
+
 
