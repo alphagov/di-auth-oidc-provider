@@ -22,7 +22,7 @@ resources:
     icon: cloud-upload
     source:
       api: https://api.cloud.service.gov.uk
-      username: ida-operations+paas-build-bot@digital.cabinet-office.gov.uk
+      username: ((cf-username))
       password: ((cf-password))
       org: gds-digital-identity-authentication
       space: sandbox
