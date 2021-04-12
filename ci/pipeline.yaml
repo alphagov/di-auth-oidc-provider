@@ -51,7 +51,8 @@ jobs:
         image_resource:
           type: registry-image
           source:
-            repository: gradle:6.8.3-jdk15
+            repository: gradle
+            tag: 6.8.3-jdk15
         inputs:
           - name: di-auth-oidc-provider
         outputs:
