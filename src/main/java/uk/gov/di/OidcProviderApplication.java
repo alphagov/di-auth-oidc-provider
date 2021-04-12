@@ -7,6 +7,7 @@ import io.dropwizard.views.ViewBundle;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import io.dropwizard.Application;
 import uk.gov.di.resources.AuthorisationResource;
+import uk.gov.di.resources.LoginResource;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration>{
     public static void main(String[] args) throws Exception {
@@ -30,5 +31,6 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
         env.jersey().register(new AuthorisationResource());
+        env.jersey().register(new LoginResource());
     }
 }

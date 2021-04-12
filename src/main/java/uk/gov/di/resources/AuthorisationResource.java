@@ -1,19 +1,22 @@
 package uk.gov.di.resources;
 
-import io.dropwizard.views.View;
-import uk.gov.di.views.LoginView;
-
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
 
 @Path("/authorize")
 public class AuthorisationResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public View authorize() {
-        return new LoginView();
+    public Response authorize() {
+            return Response
+                    .status(302)
+                    .location(URI.create("/login"))
+                    .build();
     }
 }
