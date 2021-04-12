@@ -8,14 +8,37 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    compile(
-        "com.sparkjava:spark-core:2.9.3"
-    )
+distributions {
+    main {
+        contents {
+            from {
+                [
+                        'oidc-provider.yml'
+                ]
+            }
 
-    testCompile(
-        group: 'junit', name: 'junit', version: '4.12'
-    )
+        }
+    }
 }
 
-mainClassName = 'uk.gov.di.HelloWorld'
+def dependencyVersions = [
+        dropwizard:'2.0.21',
+        nimbus_oauth2_sdk: '9.3.1',
+        nimbus_jose_jwt: '9.8.1'
+]
+
+dependencies {
+    implementation "com.nimbusds:oauth2-oidc-sdk:${dependencyVersions.nimbus_oauth2_sdk}",
+            "com.nimbusds:nimbus-jose-jwt:${dependencyVersions.nimbus_jose_jwt}",
+            "io.dropwizard:dropwizard-core:${dependencyVersions.dropwizard}",
+            "io.dropwizard:dropwizard-client:${dependencyVersions.dropwizard}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+mainClassName = 'uk.gov.di.OidcProviderApplication'
+
+run {
+    args = ['server', 'oidc-provider.yml']
+}

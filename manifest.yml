@@ -4,7 +4,7 @@ applications:
     path: build/distributions/di-auth-oidc-provider.zip
     memory: 1G
     buildpack: java_buildpack
-    command: cd di-auth-oidc-provider && bin/di-auth-oidc-provider
+    command: cd di-auth-oidc-provider && bin/di-auth-oidc-provider server ./oidc-provider.yml
     env:
       JAVA_HOME: "../.java-buildpack/open_jdk_jre"
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 15.+}}'
