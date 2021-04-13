@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,22 +25,36 @@ public class AuthorisationResourceTest {
     );
 
     @Test
-    public void shouldHandleCodeAuthenticationRequest() {
+    public void shouldProvideCodeAuthenticationRequestWhenLoggedIn() {
+        Response response = authorisationRequestBuilder()
+                .cookie("userCookie", "dummy-value")
+                .get();
+
+        assertEquals(HttpStatus.FOUND_302, response.getStatus());
+        assertEquals("example.com", response.getLocation().getHost());
+        assertEquals("/login-code", response.getLocation().getPath());
+        assertTrue(response.getLocation().getQuery().startsWith("code="));
+    }
+
+    @Test
+    public void shouldRedirectAuthenticationRequestToLoginPageIfNotLoggedIn() {
+        Response response = authorisationRequestBuilder().get();
+
+        assertEquals(HttpStatus.FOUND_302, response.getStatus());
+        assertEquals("localhost", response.getLocation().getHost());
+        assertEquals("/login", response.getLocation().getPath());
+    }
+
+    private Invocation.Builder authorisationRequestBuilder() {
         Client client = EXT.client();
 
-        Response response = client
+        return client
                 .property(ClientProperties.FOLLOW_REDIRECTS, false)
                 .target(String.format("http://localhost:%d/authorize", EXT.getLocalPort()))
                 .queryParam("client_id", "test")
                 .queryParam("scope", "openid")
                 .queryParam("response_type", "code")
-                .queryParam("redirect_uri", "http://example.com/login")
-                .request()
-                .get();
-
-        assertEquals(HttpStatus.FOUND_302, response.getStatus());
-        assertEquals("example.com", response.getLocation().getHost());
-        assertEquals("/login", response.getLocation().getPath());
-        assertTrue(response.getLocation().getQuery().startsWith("code="));
+                .queryParam("redirect_uri", "http://example.com/login-code")
+                .request();
     }
 }
