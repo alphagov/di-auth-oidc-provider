@@ -6,22 +6,25 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.Optional;
 
 @Path("/authorize")
 public class AuthorisationResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response authorize(@Context UriInfo uriInfo) throws ParseException {
-        boolean loggedIn = true;
+    public Response authorize(@Context UriInfo uriInfo, @CookieParam("userCookie") Optional<String> username) throws ParseException {
+        boolean loggedIn = username.isPresent();
 
         var authenticationRequest = AuthenticationRequest.parse(uriInfo.getRequestUri());
 
@@ -33,7 +36,8 @@ public class AuthorisationResource {
         } else {
             return Response
                     .status(302)
-                    .location(URI.create("/login"))
+                    .location(UriBuilder.fromUri(URI.create("/login"))
+                            .queryParam("auth-request", authenticationRequest.toQueryString()).build())
                     .build();
         }
     }
