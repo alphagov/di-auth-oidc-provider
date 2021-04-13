@@ -24,7 +24,8 @@ distributions {
 def dependencyVersions = [
         dropwizard:'2.0.21',
         nimbus_oauth2_sdk: '9.3.1',
-        nimbus_jose_jwt: '9.8.1'
+        nimbus_jose_jwt: '9.8.1',
+        junit_version: '5.6.0'
 ]
 
 dependencies {
@@ -35,8 +36,15 @@ dependencies {
             "io.dropwizard:dropwizard-views-mustache:${dependencyVersions.dropwizard}",
             "io.dropwizard:dropwizard-assets:${dependencyVersions.dropwizard}"
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}",
+        "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${dependencyVersions.junit_version}"
+}
+
+test {
+    useJUnitPlatform()
+    workingDir = rootDir
 }
 
 mainClassName = 'uk.gov.di.OidcProviderApplication'
