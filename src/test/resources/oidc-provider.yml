@@ -4,3 +4,5 @@ server:
   connector:
     type: http
     port: 8080
+
+issuer: di-auth-oidc-provider
