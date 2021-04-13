@@ -37,7 +37,7 @@ public class AuthorisationResource {
             return Response
                     .status(302)
                     .location(UriBuilder.fromUri(URI.create("/login"))
-                            .queryParam("auth-request", authenticationRequest.toQueryString()).build())
+                            .queryParam("authRequest", authenticationRequest.toQueryString()).build())
                     .build();
         }
     }
