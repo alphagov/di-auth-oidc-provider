@@ -23,6 +23,12 @@ import java.net.URI;
 @Path("/login")
 public class LoginResource {
 
+    private UserValidationService userValidationService;
+
+    public LoginResource(UserValidationService userValidationService) {
+        this.userValidationService = userValidationService;
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public View login(@QueryParam("authRequest") String authRequest, @QueryParam("failedLogin") boolean failedLogin) {
@@ -39,7 +45,7 @@ public class LoginResource {
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response validateLogin(@FormParam("authRequest") String authRequest, @FormParam("email") String email, @FormParam("password")String password) {
-        boolean isValid = new UserValidationService().isValidUser(email, password);
+        boolean isValid = userValidationService.isValidUser(email, password);
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest)).build();
