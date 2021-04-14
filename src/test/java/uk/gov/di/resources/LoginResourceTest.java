@@ -1,30 +1,33 @@
 package uk.gov.di.resources;
 
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import com.codahale.metrics.MetricRegistry;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
+import io.dropwizard.testing.junit5.ResourceExtension;
+import io.dropwizard.views.ViewMessageBodyWriter;
+import io.dropwizard.views.mustache.MustacheViewRenderer;
 import org.apache.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.di.OidcProviderApplication;
-import uk.gov.di.configuration.OidcProviderConfiguration;
 
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class LoginResourceTest {
 
-    private static DropwizardAppExtension<OidcProviderConfiguration> EXT = new DropwizardAppExtension<>(
-            OidcProviderApplication.class,
-            ResourceHelpers.resourceFilePath("oidc-provider.yml")
-    );
+    private static final ResourceExtension loginResource = ResourceExtension.builder()
+            .addResource(new LoginResource())
+            .setClientConfigurator(clientConfig -> {
+               clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
+            })
+            .addProvider(new ViewMessageBodyWriter(new MetricRegistry(), Collections.singleton(new MustacheViewRenderer())))
+            .build();
 
     @Test
     void shouldDisplaySuccessfulViewIfSuccessfulLogin() {
@@ -46,12 +49,8 @@ public class LoginResourceTest {
         loginResourceFormParams.add("authRequest", "whatever");
         loginResourceFormParams.add("email", email);
         loginResourceFormParams.add("password", password);
-
-        Client client = EXT.client();
-
-        return client
-                .property(ClientProperties.FOLLOW_REDIRECTS, false)
-                .target(String.format("http://localhost:%d/login/validate", EXT.getLocalPort()))
+        return loginResource
+                .target("/login/validate")
                 .request()
                 .post(Entity.form(loginResourceFormParams));
     }

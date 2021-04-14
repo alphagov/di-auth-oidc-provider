@@ -1,18 +1,18 @@
 package uk.gov.di.resources;
 
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import com.codahale.metrics.MetricRegistry;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
+import io.dropwizard.testing.junit5.ResourceExtension;
+import io.dropwizard.views.ViewMessageBodyWriter;
+import io.dropwizard.views.mustache.MustacheViewRenderer;
 import org.eclipse.jetty.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.di.OidcProviderApplication;
-import uk.gov.di.configuration.OidcProviderConfiguration;
 
-import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,10 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class AuthorisationResourceTest {
 
-    private static DropwizardAppExtension<OidcProviderConfiguration> EXT = new DropwizardAppExtension<>(
-            OidcProviderApplication.class,
-            ResourceHelpers.resourceFilePath("oidc-provider.yml")
-    );
+    private static final ResourceExtension authorizationResource = ResourceExtension.builder()
+            .addResource(new AuthorisationResource())
+            .setClientConfigurator(clientConfig -> {
+                clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
+            })
+            .addProvider(new ViewMessageBodyWriter(new MetricRegistry(), Collections.singleton(new MustacheViewRenderer())))
+            .build();
 
     @Test
     public void shouldProvideCodeAuthenticationRequestWhenLoggedIn() {
@@ -47,11 +50,8 @@ public class AuthorisationResourceTest {
     }
 
     private Invocation.Builder authorisationRequestBuilder() {
-        Client client = EXT.client();
-
-        return client
-                .property(ClientProperties.FOLLOW_REDIRECTS, false)
-                .target(String.format("http://localhost:%d/authorize", EXT.getLocalPort()))
+        return authorizationResource
+                .target("/authorize")
                 .queryParam("client_id", "test")
                 .queryParam("scope", "openid")
                 .queryParam("response_type", "code")
