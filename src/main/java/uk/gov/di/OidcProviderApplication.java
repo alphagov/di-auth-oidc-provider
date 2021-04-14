@@ -11,6 +11,7 @@ import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
 import uk.gov.di.services.TokenService;
+import uk.gov.di.services.UserValidationService;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration>{
     public static void main(String[] args) throws Exception {
@@ -34,7 +35,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
         env.jersey().register(new AuthorisationResource());
-        env.jersey().register(new LoginResource());
+        env.jersey().register(new LoginResource(new UserValidationService()));
         env.jersey().register(new UserInfoResource());
         env.jersey().register(new TokenResource(new TokenService(configuration)));
     }

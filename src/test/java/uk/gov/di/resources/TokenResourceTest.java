@@ -6,7 +6,6 @@ import io.dropwizard.testing.junit5.ResourceExtension;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.di.resources.TokenResource;
 import uk.gov.di.services.TokenService;
 
 import javax.ws.rs.client.Entity;
