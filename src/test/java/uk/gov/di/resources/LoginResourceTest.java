@@ -39,12 +39,12 @@ public class LoginResourceTest {
     @BeforeAll
     static void setUp() {
         when(userValidationService.isValidUser(anyString(), anyString())).thenReturn(false);
-        when(userValidationService.isValidUser(eq("test@digital.cabinet-office.gov.uk"), eq("password"))).thenReturn(true);
+        when(userValidationService.isValidUser(eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password"))).thenReturn(true);
     }
 
     @Test
     void shouldDisplaySuccessfulViewIfSuccessfulLogin() {
-        final Response response = loginRequest("test@digital.cabinet-office.gov.uk", "password");
+        final Response response = loginRequest("joe.bloggs@digital.cabinet-office.gov.uk", "password");
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
     }

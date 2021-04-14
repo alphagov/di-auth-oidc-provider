@@ -25,9 +25,9 @@ public class UserInfoResource {
             AccessToken accessToken = AccessToken.parse(authorizationHeader);
 
             UserInfo userInfo = new UserInfo(new Subject());
-            userInfo.setFamilyName("Smith");
-            userInfo.setGivenName("John");
-            userInfo.setEmailAddress("john.smith@example.com");
+            userInfo.setFamilyName("Bloggs");
+            userInfo.setGivenName("Joe");
+            userInfo.setEmailAddress("joe.bloggs@digital.cabinet-office.gov.uk");
             userInfo.setGender(Gender.MALE);
 
             return Response.ok(userInfo.toJSONObject()).build();
