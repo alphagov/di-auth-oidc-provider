@@ -9,6 +9,7 @@ import io.dropwizard.Application;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.TokenResource;
+import uk.gov.di.resources.UserInfoResource;
 import uk.gov.di.services.TokenService;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration>{
@@ -34,6 +35,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     public void run(OidcProviderConfiguration configuration, Environment env) {
         env.jersey().register(new AuthorisationResource());
         env.jersey().register(new LoginResource());
+        env.jersey().register(new UserInfoResource());
         env.jersey().register(new TokenResource(new TokenService(configuration)));
     }
 }
