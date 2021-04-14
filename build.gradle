@@ -25,7 +25,8 @@ def dependencyVersions = [
         dropwizard:'2.0.21',
         nimbus_oauth2_sdk: '9.3.1',
         nimbus_jose_jwt: '9.8.1',
-        junit_version: '5.6.0'
+        junit_version: '5.6.0',
+        mockito_version: '3.9.0'
 ]
 
 dependencies {
@@ -37,7 +38,9 @@ dependencies {
             "io.dropwizard:dropwizard-assets:${dependencyVersions.dropwizard}"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}",
-        "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}"
+        "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}",
+            "org.mockito:mockito-core:${dependencyVersions.mockito_version}",
+            "org.mockito:mockito-junit-jupiter:${dependencyVersions.mockito_version}"
 
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${dependencyVersions.junit_version}"
 }
