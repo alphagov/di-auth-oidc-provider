@@ -8,8 +8,16 @@ public class LoginView extends View {
         this.authRequest = authRequest;
     }
 
+    public LoginView(String authRequest, boolean failedLogin) {
+        super("login.mustache");
+        this.authRequest = authRequest;
+        this.failedLogin = failedLogin;
+    }
+
+    private boolean failedLogin;
     private String authRequest;
 
+    public boolean isFailedLogin() { return failedLogin; }
     public String getAuthRequest() {
         return authRequest;
     }
