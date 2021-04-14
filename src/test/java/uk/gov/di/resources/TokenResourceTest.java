@@ -1,4 +1,4 @@
-package uk.gov.di;
+package uk.gov.di.resources;
 
 import com.nimbusds.jwt.SignedJWT;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
