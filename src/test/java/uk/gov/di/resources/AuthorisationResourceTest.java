@@ -1,4 +1,4 @@
-package uk.gov.di;
+package uk.gov.di.resources;
 
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
@@ -7,6 +7,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.OidcProviderApplication;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 
 import javax.ws.rs.client.Client;

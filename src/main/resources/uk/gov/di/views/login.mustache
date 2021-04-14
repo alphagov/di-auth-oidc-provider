@@ -47,6 +47,21 @@
                 <h1 class="govuk-heading-l">
                     Sign in to or create your GOV.UK Account
                 </h1>
+                {{#failedLogin}}
+                    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+                        <h2 class="govuk-error-summary__title" id="error-summary-title">
+                            There is a problem
+                        </h2>
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                <li>
+                                    <a>The user credentials are not valid.  Please try again.</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {{/failedLogin}}
+
                 <div class="govuk-inset-text">
                     A GOV.UK Account is separate from other government accounts (for example a personal tax account or Government Gateway).<br><!-- A GOV.UK Account will become the single sign-on for all of government. -->
                 </div>
@@ -86,7 +101,7 @@
                         <label class="govuk-label" for="email">
                             Email address
                         </label>
-                        <input class="govuk-input" id="email" name="email" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email">
+                        <input class="govuk-input" id="email" name="email" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email" required="required">
                     </div>
                     <button class="govuk-button" data-module="govuk-button">Continue</button>
                 </form>

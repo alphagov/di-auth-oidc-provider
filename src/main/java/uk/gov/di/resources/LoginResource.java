@@ -1,10 +1,12 @@
 package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
+import uk.gov.di.services.UserValidationService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 @Path("/login")
@@ -22,19 +25,35 @@ public class LoginResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public View login(@QueryParam("authRequest") String authRequest) {
-        return new LoginView(authRequest);
+    public View login(@QueryParam("authRequest") String authRequest, @QueryParam("failedLogin") boolean failedLogin) {
+        return new LoginView(authRequest, failedLogin);
     }
 
     @POST
     public View login(@FormParam("authRequest") String authRequest, @FormParam("email") String email) {
-        return new PasswordView(authRequest);
+        return new PasswordView(authRequest, email);
     }
 
     @POST
     @Path("/validate")
-    public View validateLogin(@FormParam("authRequest") String authRequest, @FormParam("password")String password) {
-        return new SuccessfulLoginView(authRequest);
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response validateLogin(@FormParam("authRequest") String authRequest, @FormParam("email") String email, @FormParam("password")String password) {
+        boolean isValid = new UserValidationService().isValidUser(email, password);
+
+        if (isValid) {
+            return Response.ok(new SuccessfulLoginView(authRequest)).build();
+        }
+        else {
+            URI destination = UriBuilder.fromUri(URI.create("/login"))
+                    .queryParam("authRequest", authRequest)
+                    .queryParam("failedLogin", true).build();
+
+            return Response
+                    .status(302)
+                    .location(destination)
+                    .build();
+        }
     }
 
     @POST
