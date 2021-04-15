@@ -7,8 +7,10 @@ import io.dropwizard.views.ViewMessageBodyWriter;
 import io.dropwizard.views.mustache.MustacheViewRenderer;
 import org.eclipse.jetty.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
@@ -16,17 +18,27 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class AuthorisationResourceTest {
 
+    private static final ClientService clientService = mock(ClientService.class);
+
     private static final ResourceExtension authorizationResource = ResourceExtension.builder()
-            .addResource(new AuthorisationResource())
+            .addResource(new AuthorisationResource(clientService))
             .setClientConfigurator(clientConfig -> {
                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
             })
             .addProvider(new ViewMessageBodyWriter(new MetricRegistry(), Collections.singleton(new MustacheViewRenderer())))
             .build();
+
+    @BeforeAll
+    public static void setUp() {
+        when(clientService.isAuthorizationRequestValid(any())).thenReturn(true);
+    }
 
     @Test
     public void shouldProvideCodeAuthenticationRequestWhenLoggedIn() {
