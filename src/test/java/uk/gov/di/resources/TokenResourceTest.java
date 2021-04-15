@@ -35,6 +35,7 @@ public class TokenResourceTest {
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
         tokenResourceFormParams.add("code", "123");
         tokenResourceFormParams.add("client_id",  "123");
+        tokenResourceFormParams.add("client_secret",  "123");
 
         final Response response = tokenResourceExtension.target("/token").request()
                 .post(Entity.form(tokenResourceFormParams));
@@ -49,6 +50,7 @@ public class TokenResourceTest {
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
         tokenResourceFormParams.add("code", "123");
         tokenResourceFormParams.add("client_id",  "123");
+        tokenResourceFormParams.add("client_secret",  "123");
 
         final Response response = tokenResourceExtension.target("/token").request()
                 .post(Entity.form(tokenResourceFormParams));
