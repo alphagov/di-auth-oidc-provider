@@ -63,7 +63,7 @@ jobs:
             - -euc
             - |
               cd di-auth-oidc-provider
-              gradle --no-daemon build
+              gradle --no-daemon build -x spotlessApply
               cp build/distributions/di-auth-oidc-provider.zip ../di-auth-oidc-provider-zip/
     - put: di-auth-oidc-provider-upload
       params:
