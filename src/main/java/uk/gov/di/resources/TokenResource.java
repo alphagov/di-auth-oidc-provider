@@ -33,9 +33,11 @@ public class TokenResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTokens(@FormParam("code") @NotNull AuthorizationCode code, @FormParam("client_id") @NotNull String clientId) throws ParseException {
+    public Response getTokens(@FormParam("code") @NotNull AuthorizationCode code,
+                              @FormParam("client_id") @NotNull String clientId,
+                              @FormParam("client_secret") @NotNull String clientSecret) throws ParseException {
 
-        if (!clientService.isRegisteredClient(clientId)) {
+        if (!clientService.isValidClient(clientId, clientSecret)) {
             throw new RuntimeException("Bad authentication request");
         }
 
