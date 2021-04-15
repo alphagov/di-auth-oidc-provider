@@ -7,6 +7,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
+import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
 
 import javax.validation.constraints.NotNull;
@@ -22,15 +23,21 @@ import javax.ws.rs.core.Response;
 public class TokenResource {
 
     private TokenService tokenService;
+    private final ClientService clientService;
 
-    public TokenResource(TokenService tokenService) {
+    public TokenResource(TokenService tokenService, ClientService clientService) {
         this.tokenService = tokenService;
+        this.clientService = clientService;
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTokens(@FormParam("code") @NotNull AuthorizationCode code, @FormParam("client_id") @NotNull String clientId) throws ParseException {
+
+        if (!clientService.isRegisteredClient(clientId)) {
+            throw new RuntimeException("Bad authentication request");
+        }
 
         AccessToken accessToken = new BearerAccessToken();
         SignedJWT idToken = tokenService.generateIDToken(clientId);

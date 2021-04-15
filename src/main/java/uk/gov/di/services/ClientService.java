@@ -25,6 +25,10 @@ public class ClientService {
         }
     }
 
+    public boolean isRegisteredClient(String clientId) {
+        return clients.stream().anyMatch(t -> t.getClientId().equals(clientId));
+    }
+
     private Client getClient(String clientId) {
         Optional<Client> client = clients.stream().filter(t -> t.getClientId().equals(clientId)).findFirst();
 
