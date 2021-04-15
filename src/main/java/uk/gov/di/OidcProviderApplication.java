@@ -44,7 +44,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
                                 new Client(
                                         "some_client_id",
                                         "password",
-                                        List.of("openid"),
+                                        List.of("openid", "profile", "email"),
                                         List.of("code"),
                                         List.of(
                                                 "https://di-auth-stub-relying-party.london.cloudapps.digital/oidc/callback",
