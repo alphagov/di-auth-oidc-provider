@@ -33,12 +33,13 @@ public class TokenService {
         LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(2);
         Date expiryDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        IDTokenClaimsSet idTokenClaims = new IDTokenClaimsSet(
-                new Issuer(config.getIssuer()),
-                new Subject(),
-                List.of(new Audience(clientId)),
-                expiryDate,
-                new Date());
+        IDTokenClaimsSet idTokenClaims =
+                new IDTokenClaimsSet(
+                        new Issuer(config.getIssuer()),
+                        new Subject(),
+                        List.of(new Audience(clientId)),
+                        expiryDate,
+                        new Date());
 
         JWTClaimsSet jwtClaimsSet;
         try {
@@ -47,7 +48,8 @@ public class TokenService {
             throw new RuntimeException("Can't convert IDTokenClaimsSet to JWTClaimsSet");
         }
         RSAKey signingKey = createSigningKey();
-        JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(signingKey.getKeyID()).build();
+        JWSHeader jwsHeader =
+                new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(signingKey.getKeyID()).build();
         SignedJWT idToken;
 
         try {

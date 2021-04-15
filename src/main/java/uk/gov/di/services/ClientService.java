@@ -21,9 +21,13 @@ public class ClientService {
             return false;
         }
 
-        return client.get().getAllowedResponseTypes().contains(authRequest.getResponseType().toString()) &&
-                client.get().getScopes().containsAll(authRequest.getScope().toStringList()) &&
-                client.get().getRedirectUris().contains(authRequest.getRedirectionURI().toString());
+        return client.get()
+                        .getAllowedResponseTypes()
+                        .contains(authRequest.getResponseType().toString())
+                && client.get().getScopes().containsAll(authRequest.getScope().toStringList())
+                && client.get()
+                        .getRedirectUris()
+                        .contains(authRequest.getRedirectionURI().toString());
     }
 
     public boolean isValidClient(String clientId, String clientSecret) {

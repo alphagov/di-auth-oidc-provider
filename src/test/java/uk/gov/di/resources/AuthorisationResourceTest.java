@@ -14,6 +14,7 @@ import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
+
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,13 +28,18 @@ public class AuthorisationResourceTest {
 
     private static final ClientService clientService = mock(ClientService.class);
 
-    private static final ResourceExtension authorizationResource = ResourceExtension.builder()
-            .addResource(new AuthorisationResource(clientService))
-            .setClientConfigurator(clientConfig -> {
-                clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
-            })
-            .addProvider(new ViewMessageBodyWriter(new MetricRegistry(), Collections.singleton(new MustacheViewRenderer())))
-            .build();
+    private static final ResourceExtension authorizationResource =
+            ResourceExtension.builder()
+                    .addResource(new AuthorisationResource(clientService))
+                    .setClientConfigurator(
+                            clientConfig -> {
+                                clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
+                            })
+                    .addProvider(
+                            new ViewMessageBodyWriter(
+                                    new MetricRegistry(),
+                                    Collections.singleton(new MustacheViewRenderer())))
+                    .build();
 
     @BeforeAll
     public static void setUp() {
@@ -42,9 +48,7 @@ public class AuthorisationResourceTest {
 
     @Test
     public void shouldProvideCodeAuthenticationRequestWhenLoggedIn() {
-        Response response = authorisationRequestBuilder()
-                .cookie("userCookie", "dummy-value")
-                .get();
+        Response response = authorisationRequestBuilder().cookie("userCookie", "dummy-value").get();
 
         assertEquals(HttpStatus.FOUND_302, response.getStatus());
         assertEquals("example.com", response.getLocation().getHost());

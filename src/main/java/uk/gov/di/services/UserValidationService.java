@@ -9,5 +9,4 @@ public class UserValidationService {
 
         return credentialsMap.containsKey(email) && credentialsMap.get(email).equals(password);
     }
-
 }

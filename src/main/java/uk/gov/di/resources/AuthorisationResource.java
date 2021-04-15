@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
 import java.net.URI;
 import java.util.Optional;
 
@@ -30,7 +31,9 @@ public class AuthorisationResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public Response authorize(@Context UriInfo uriInfo, @CookieParam("userCookie") Optional<String> username) throws ParseException {
+    public Response authorize(
+            @Context UriInfo uriInfo, @CookieParam("userCookie") Optional<String> username)
+            throws ParseException {
         boolean loggedIn = username.isPresent();
 
         var authenticationRequest = AuthenticationRequest.parse(uriInfo.getRequestUri());
@@ -41,19 +44,20 @@ public class AuthorisationResource {
 
         if (loggedIn) {
             AuthenticationResponse response = handleAuthenticationRequest(authenticationRequest);
-            return Response
-                    .status(302)
-                    .location(response.toSuccessResponse().toURI()).build();
+            return Response.status(302).location(response.toSuccessResponse().toURI()).build();
         } else {
-            return Response
-                    .status(302)
-                    .location(UriBuilder.fromUri(URI.create("/login"))
-                            .queryParam("authRequest", authenticationRequest.toQueryString()).build())
+            return Response.status(302)
+                    .location(
+                            UriBuilder.fromUri(URI.create("/login"))
+                                    .queryParam(
+                                            "authRequest", authenticationRequest.toQueryString())
+                                    .build())
                     .build();
         }
     }
 
-    public AuthenticationResponse handleAuthenticationRequest(AuthenticationRequest authenticationRequest) {
+    public AuthenticationResponse handleAuthenticationRequest(
+            AuthenticationRequest authenticationRequest) {
         return new AuthenticationSuccessResponse(
                 authenticationRequest.getRedirectionURI(),
                 new AuthorizationCode(),
@@ -61,7 +65,6 @@ public class AuthorisationResource {
                 null,
                 authenticationRequest.getState(),
                 null,
-                null
-        );
+                null);
     }
 }

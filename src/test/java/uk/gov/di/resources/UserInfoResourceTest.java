@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(DropwizardExtensionsSupport.class)
 class UserInfoResourceTest {
 
-    private static final ResourceExtension userInfoExtension = ResourceExtension.builder().addResource(new UserInfoResource()).build();
+    private static final ResourceExtension userInfoExtension =
+            ResourceExtension.builder().addResource(new UserInfoResource()).build();
 
     @Test
     void shouldReturnUnauthorisedIfNoHeaderPresent() {
@@ -25,7 +26,12 @@ class UserInfoResourceTest {
 
     @Test
     void shouldReturnUserDataIfAuthorisationHeaderPresent() {
-        final Response response = userInfoExtension.target("/userinfo").request().header("Authorization", "Bearer sometoken").get();
+        final Response response =
+                userInfoExtension
+                        .target("/userinfo")
+                        .request()
+                        .header("Authorization", "Bearer sometoken")
+                        .get();
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
         assertTrue(response.hasEntity());

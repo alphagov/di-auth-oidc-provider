@@ -1,11 +1,11 @@
 package uk.gov.di;
 
+import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import uk.gov.di.configuration.OidcProviderConfiguration;
-import io.dropwizard.Application;
 import uk.gov.di.entity.Client;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.LoginResource;
@@ -17,7 +17,7 @@ import uk.gov.di.services.UserValidationService;
 
 import java.util.List;
 
-public class OidcProviderApplication extends Application<OidcProviderConfiguration>{
+public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
     public static void main(String[] args) throws Exception {
         new OidcProviderApplication().run(args);
     }
@@ -38,17 +38,17 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-        ClientService clientService = new ClientService(
-                List.of(
-                        new Client(
-                                "some_client_id",
-                                "password",
-                                List.of("openid"),
-                                List.of("code"),
-                                List.of(
-                                        "https://di-auth-stub-relying-party.london.cloudapps.digital/oidc/callback",
-                                        "http://localhost:8081/oidc/callback"
-                                ))));
+        ClientService clientService =
+                new ClientService(
+                        List.of(
+                                new Client(
+                                        "some_client_id",
+                                        "password",
+                                        List.of("openid"),
+                                        List.of("code"),
+                                        List.of(
+                                                "https://di-auth-stub-relying-party.london.cloudapps.digital/oidc/callback",
+                                                "http://localhost:8081/oidc/callback"))));
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(new UserValidationService()));
         env.jersey().register(new UserInfoResource());
