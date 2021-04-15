@@ -6,12 +6,16 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import io.dropwizard.Application;
+import uk.gov.di.entity.Client;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
+import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserValidationService;
+
+import java.util.List;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration>{
     public static void main(String[] args) throws Exception {
@@ -34,7 +38,15 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-        env.jersey().register(new AuthorisationResource());
+        ClientService clientService = new ClientService(
+                List.of(
+                        new Client(
+                                "some_client_id",
+                                "password",
+                                List.of("openid"),
+                                List.of("code"),
+                                List.of("http://localhost:8081/someRedirectUri"))));
+        env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(new UserValidationService()));
         env.jersey().register(new UserInfoResource());
         env.jersey().register(new TokenResource(new TokenService(configuration)));
