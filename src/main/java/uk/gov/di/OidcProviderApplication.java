@@ -45,7 +45,10 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
                                 "password",
                                 List.of("openid"),
                                 List.of("code"),
-                                List.of("http://localhost:8081/someRedirectUri"))));
+                                List.of(
+                                        "https://di-auth-stub-relying-party.london.cloudapps.digital/oidc/callback",
+                                        "http://localhost:8081/oidc/callback"
+                                ))));
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(new UserValidationService()));
         env.jersey().register(new UserInfoResource());
