@@ -26,8 +26,9 @@ public class ClientService {
                 client.get().getRedirectUris().contains(authRequest.getRedirectionURI().toString());
     }
 
-    public boolean isRegisteredClient(String clientId) {
-        return getClient(clientId).isPresent();
+    public boolean isValidClient(String clientId, String clientSecret) {
+        Optional<Client> client = getClient(clientId);
+        return client.isPresent() && client.get().getClientSecret().equals(clientSecret);
     }
 
     private Optional<Client> getClient(String clientId) {

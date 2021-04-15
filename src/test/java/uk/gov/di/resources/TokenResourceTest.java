@@ -30,7 +30,7 @@ public class TokenResourceTest {
     @Test
     public void testTokenResource() {
         when(tokenService.generateIDToken(anyString())).thenReturn(signedJWT);
-        when(clientService.isRegisteredClient(anyString())).thenReturn(true);
+        when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
         tokenResourceFormParams.add("code", "123");
@@ -43,8 +43,8 @@ public class TokenResourceTest {
     }
 
     @Test
-    public void shouldValidateClientId() {
-        when(clientService.isRegisteredClient(anyString())).thenReturn(false);
+    public void shouldValidateClientCredentials() {
+        when(clientService.isValidClient(anyString(), anyString())).thenReturn(false);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
         tokenResourceFormParams.add("code", "123");
