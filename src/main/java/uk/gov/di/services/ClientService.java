@@ -15,26 +15,22 @@ public class ClientService {
     }
 
     public boolean isAuthorizationRequestValid(AuthorizationRequest authRequest) {
-        try {
-            Client client = getClient(authRequest.getClientID().toString());
-            return client.getAllowedResponseTypes().contains(authRequest.getResponseType()) &&
-                    client.getScopes().containsAll(authRequest.getScope().toStringList()) &&
-                    client.getRedirectUris().contains(authRequest.getRedirectionURI().toString());
-        } catch (RuntimeException e) {
+        Optional<Client> client = getClient(authRequest.getClientID().toString());
+
+        if (client.isEmpty()) {
             return false;
         }
+
+        return client.get().getAllowedResponseTypes().contains(authRequest.getResponseType().toString()) &&
+                client.get().getScopes().containsAll(authRequest.getScope().toStringList()) &&
+                client.get().getRedirectUris().contains(authRequest.getRedirectionURI().toString());
     }
 
     public boolean isRegisteredClient(String clientId) {
-        return clients.stream().anyMatch(t -> t.getClientId().equals(clientId));
+        return getClient(clientId).isPresent();
     }
 
-    private Client getClient(String clientId) {
-        Optional<Client> client = clients.stream().filter(t -> t.getClientId().equals(clientId)).findFirst();
-
-        if (client.isEmpty()) {
-            throw new RuntimeException("Client doesn't exist");
-        }
-        return client.get();
+    private Optional<Client> getClient(String clientId) {
+        return clients.stream().filter(t -> t.getClientId().equals(clientId)).findFirst();
     }
 }
