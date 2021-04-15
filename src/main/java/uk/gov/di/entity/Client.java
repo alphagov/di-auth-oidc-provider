@@ -10,7 +10,12 @@ public class Client {
     private List<String> allowedResponseTypes;
     private List<String> redirectUris;
 
-    public Client(String clientId, String clientSecret, List<String> scopes, List<String> allowedResponseTypes, List<String> redirectUris) {
+    public Client(
+            String clientId,
+            String clientSecret,
+            List<String> scopes,
+            List<String> allowedResponseTypes,
+            List<String> redirectUris) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.scopes = scopes;

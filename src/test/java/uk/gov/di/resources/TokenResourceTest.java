@@ -25,7 +25,10 @@ public class TokenResourceTest {
     private static final TokenService tokenService = mock(TokenService.class);
     private static final ClientService clientService = mock(ClientService.class);
     private static final SignedJWT signedJWT = mock(SignedJWT.class);
-    private static final ResourceExtension tokenResourceExtension = ResourceExtension.builder().addResource(new TokenResource(tokenService, clientService)).build();
+    private static final ResourceExtension tokenResourceExtension =
+            ResourceExtension.builder()
+                    .addResource(new TokenResource(tokenService, clientService))
+                    .build();
 
     @Test
     public void testTokenResource() {
@@ -34,11 +37,14 @@ public class TokenResourceTest {
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
         tokenResourceFormParams.add("code", "123");
-        tokenResourceFormParams.add("client_id",  "123");
-        tokenResourceFormParams.add("client_secret",  "123");
+        tokenResourceFormParams.add("client_id", "123");
+        tokenResourceFormParams.add("client_secret", "123");
 
-        final Response response = tokenResourceExtension.target("/token").request()
-                .post(Entity.form(tokenResourceFormParams));
+        final Response response =
+                tokenResourceExtension
+                        .target("/token")
+                        .request()
+                        .post(Entity.form(tokenResourceFormParams));
 
         assertEquals(HttpStatus.OK_200, response.getStatus());
     }
@@ -49,11 +55,14 @@ public class TokenResourceTest {
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
         tokenResourceFormParams.add("code", "123");
-        tokenResourceFormParams.add("client_id",  "123");
-        tokenResourceFormParams.add("client_secret",  "123");
+        tokenResourceFormParams.add("client_id", "123");
+        tokenResourceFormParams.add("client_secret", "123");
 
-        final Response response = tokenResourceExtension.target("/token").request()
-                .post(Entity.form(tokenResourceFormParams));
+        final Response response =
+                tokenResourceExtension
+                        .target("/token")
+                        .request()
+                        .post(Entity.form(tokenResourceFormParams));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, response.getStatus());
     }

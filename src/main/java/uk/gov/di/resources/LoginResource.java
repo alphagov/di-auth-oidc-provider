@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+
 import java.net.URI;
 
 @Path("/login")
@@ -31,12 +32,15 @@ public class LoginResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public View login(@QueryParam("authRequest") String authRequest, @QueryParam("failedLogin") boolean failedLogin) {
+    public View login(
+            @QueryParam("authRequest") String authRequest,
+            @QueryParam("failedLogin") boolean failedLogin) {
         return new LoginView(authRequest, failedLogin);
     }
 
     @POST
-    public View login(@FormParam("authRequest") String authRequest, @FormParam("email") String email) {
+    public View login(
+            @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
         return new PasswordView(authRequest, email);
     }
 
@@ -44,21 +48,22 @@ public class LoginResource {
     @Path("/validate")
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response validateLogin(@FormParam("authRequest") String authRequest, @FormParam("email") String email, @FormParam("password")String password) {
+    public Response validateLogin(
+            @FormParam("authRequest") String authRequest,
+            @FormParam("email") String email,
+            @FormParam("password") String password) {
         boolean isValid = userValidationService.isValidUser(email, password);
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest)).build();
-        }
-        else {
-            URI destination = UriBuilder.fromUri(URI.create("/login"))
-                    .queryParam("authRequest", authRequest)
-                    .queryParam("failedLogin", true).build();
+        } else {
+            URI destination =
+                    UriBuilder.fromUri(URI.create("/login"))
+                            .queryParam("authRequest", authRequest)
+                            .queryParam("failedLogin", true)
+                            .build();
 
-            return Response
-                    .status(302)
-                    .location(destination)
-                    .build();
+            return Response.status(302).location(destination).build();
         }
     }
 
@@ -67,7 +72,16 @@ public class LoginResource {
     public Response continueToAuthorize(@FormParam("authRequest") String authRequest) {
         return Response.status(Response.Status.FOUND)
                 .location(URI.create("/authorize?" + authRequest))
-                .cookie(new NewCookie("userCookie", "dummy", "/", null, Cookie.DEFAULT_VERSION, null, NewCookie.DEFAULT_MAX_AGE, false)
-        ).build();
+                .cookie(
+                        new NewCookie(
+                                "userCookie",
+                                "dummy",
+                                "/",
+                                null,
+                                Cookie.DEFAULT_VERSION,
+                                null,
+                                NewCookie.DEFAULT_MAX_AGE,
+                                false))
+                .build();
     }
 }

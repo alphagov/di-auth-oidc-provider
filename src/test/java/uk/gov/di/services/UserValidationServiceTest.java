@@ -11,7 +11,9 @@ public class UserValidationServiceTest {
 
     @Test
     public void shouldValidateUserWithCorrectCredentials() {
-        assertTrue(userValidationService.isValidUser("joe.bloggs@digital.cabinet-office.gov.uk", "password"));
+        assertTrue(
+                userValidationService.isValidUser(
+                        "joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     }
 
     @Test
@@ -21,7 +23,8 @@ public class UserValidationServiceTest {
 
     @Test
     public void shouldValidateUserWithWrongPassword() {
-        assertFalse(userValidationService.isValidUser("joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
+        assertFalse(
+                userValidationService.isValidUser(
+                        "joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
     }
-
 }

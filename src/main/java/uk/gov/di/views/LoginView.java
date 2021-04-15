@@ -17,7 +17,10 @@ public class LoginView extends View {
     private boolean failedLogin;
     private String authRequest;
 
-    public boolean isFailedLogin() { return failedLogin; }
+    public boolean isFailedLogin() {
+        return failedLogin;
+    }
+
     public String getAuthRequest() {
         return authRequest;
     }
