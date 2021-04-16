@@ -2,6 +2,7 @@ package uk.gov.di;
 
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
@@ -11,7 +12,9 @@ import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
+import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
+import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserValidationService;
 
@@ -38,6 +41,9 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
+        var postgresService = new PostgresService(configuration);
+        var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
+        var clientConfigService = new ClientConfigService(jdbiFactory);
         var clientService =
                 new ClientService(
                         List.of(

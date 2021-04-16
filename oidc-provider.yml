@@ -6,3 +6,9 @@ server:
     port: 8080
 
 issuer: di-auth-oidc-provider
+
+database:
+  driverClass: org.postgresql.Driver
+  user: ${OIDC_PROVIDER_SQL_DB_USER:-user}
+  password: "${OIDC_PROVIDER_SQL_DB_PASSWORD:-password}"
+  url: jdbc:postgresql://${OIDC_PROVIDER_SQL_DB_HOST:-localhost}:${OIDC_PROVIDER_SQL_DB_PORT:-15432}/${OIDC_PROVIDER_SQL_DB_NAME:-client-store}

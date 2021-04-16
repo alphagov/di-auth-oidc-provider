@@ -49,7 +49,9 @@ dependencies {
             "io.dropwizard:dropwizard-core:${dependencyVersions.dropwizard}",
             "io.dropwizard:dropwizard-client:${dependencyVersions.dropwizard}",
             "io.dropwizard:dropwizard-views-mustache:${dependencyVersions.dropwizard}",
-            "io.dropwizard:dropwizard-assets:${dependencyVersions.dropwizard}"
+            "io.dropwizard:dropwizard-assets:${dependencyVersions.dropwizard}",
+            "io.dropwizard:dropwizard-jdbi3:${dependencyVersions.dropwizard}",
+            "org.postgresql:postgresql:42.2.19"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}",
         "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}",
