@@ -16,6 +16,7 @@ import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
+import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserValidationService;
 
@@ -46,6 +47,8 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
+        PostgresService postgresService = new PostgresService(configuration);
+        configuration.getDatabase().setUrl(postgresService.getUri());
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var clientService =

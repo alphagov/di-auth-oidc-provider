@@ -8,6 +8,7 @@ import uk.gov.di.configuration.OidcProviderConfiguration;
 public class PostgresService {
 
     private OidcProviderConfiguration config;
+    private String uri;
 
     public PostgresService(OidcProviderConfiguration config) {
         this.config = config;
@@ -30,7 +31,7 @@ public class PostgresService {
             if (postgresJsonNode.isArray()) {
                 for (JsonNode node : postgresJsonNode) {
                     JsonNode credentials = node.get("credentials");
-                    String uri =
+                    uri =
                             "jdbc:postgresql://"
                                     + credentials.get("host").toString()
                                     + ":"
@@ -45,5 +46,9 @@ public class PostgresService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getUri() {
+        return uri;
     }
 }
