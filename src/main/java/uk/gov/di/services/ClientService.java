@@ -1,7 +1,11 @@
 package uk.gov.di.services;
 
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.OIDCError;
 import uk.gov.di.entity.Client;
+import uk.gov.di.helpers.AuthenticationResponseHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,20 +18,32 @@ public class ClientService {
         this.clients = clients;
     }
 
-    public boolean isAuthorizationRequestValid(AuthorizationRequest authRequest) {
-        Optional<Client> client = getClient(authRequest.getClientID().toString());
+    public AuthenticationResponse validateAuthorizationRequest(AuthorizationRequest authRequest) {
+        Optional<Client> clientMaybe = getClient(authRequest.getClientID().toString());
 
-        if (client.isEmpty()) {
-            return false;
+        if (clientMaybe.isEmpty()) {
+            return AuthenticationResponseHelper.generateErrorAuthnResponse(
+                    authRequest, OIDCError.UNMET_AUTHENTICATION_REQUIREMENTS);
         }
 
-        return client.get()
-                        .getAllowedResponseTypes()
-                        .contains(authRequest.getResponseType().toString())
-                && client.get().getScopes().containsAll(authRequest.getScope().toStringList())
-                && client.get()
-                        .getRedirectUris()
-                        .contains(authRequest.getRedirectionURI().toString());
+        var client = clientMaybe.get();
+
+        if (!client.getRedirectUris().contains(authRequest.getRedirectionURI().toString())) {
+            return AuthenticationResponseHelper.generateErrorAuthnResponse(
+                    authRequest, OAuth2Error.INVALID_REQUEST_URI);
+        }
+
+        if (!client.getAllowedResponseTypes().contains(authRequest.getResponseType().toString())) {
+            return AuthenticationResponseHelper.generateErrorAuthnResponse(
+                    authRequest, OAuth2Error.UNSUPPORTED_RESPONSE_TYPE);
+        }
+
+        if (!client.getScopes().containsAll(authRequest.getScope().toStringList())) {
+            return AuthenticationResponseHelper.generateErrorAuthnResponse(
+                    authRequest, OAuth2Error.INVALID_SCOPE);
+        }
+
+        return AuthenticationResponseHelper.generateSuccessfulAuthResponse(authRequest);
     }
 
     public boolean isValidClient(String clientId, String clientSecret) {

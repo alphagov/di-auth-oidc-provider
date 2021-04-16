@@ -38,7 +38,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-        ClientService clientService =
+        var clientService =
                 new ClientService(
                         List.of(
                                 new Client(
