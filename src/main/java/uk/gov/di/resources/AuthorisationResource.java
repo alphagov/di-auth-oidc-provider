@@ -1,10 +1,9 @@
 package uk.gov.di.resources;
 
-import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
-import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+import org.eclipse.jetty.http.HttpStatus;
 import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.CookieParam;
@@ -33,38 +32,30 @@ public class AuthorisationResource {
     @Produces(MediaType.TEXT_HTML)
     public Response authorize(
             @Context UriInfo uriInfo, @CookieParam("userCookie") Optional<String> username)
-            throws ParseException {
+            throws ParseException, RuntimeException {
         boolean loggedIn = username.isPresent();
 
-        var authenticationRequest = AuthenticationRequest.parse(uriInfo.getRequestUri());
+        var authRequest = AuthenticationRequest.parse(uriInfo.getRequestUri());
 
-        if (!clientService.isAuthorizationRequestValid(authenticationRequest)) {
-            throw new RuntimeException("Bad authentication request");
+        AuthenticationResponse response = clientService.validateAuthorizationRequest(authRequest);
+
+        if (!response.indicatesSuccess()) {
+            return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
+                    .location(response.toErrorResponse().toURI())
+                    .build();
         }
 
         if (loggedIn) {
-            AuthenticationResponse response = handleAuthenticationRequest(authenticationRequest);
-            return Response.status(302).location(response.toSuccessResponse().toURI()).build();
+            return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
+                    .location(response.toSuccessResponse().toURI())
+                    .build();
         } else {
-            return Response.status(302)
+            return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
                     .location(
                             UriBuilder.fromUri(URI.create("/login"))
-                                    .queryParam(
-                                            "authRequest", authenticationRequest.toQueryString())
+                                    .queryParam("authRequest", authRequest.toQueryString())
                                     .build())
                     .build();
         }
-    }
-
-    public AuthenticationResponse handleAuthenticationRequest(
-            AuthenticationRequest authenticationRequest) {
-        return new AuthenticationSuccessResponse(
-                authenticationRequest.getRedirectionURI(),
-                new AuthorizationCode(),
-                null,
-                null,
-                authenticationRequest.getState(),
-                null,
-                null);
     }
 }

@@ -6,11 +6,11 @@ import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import org.junit.jupiter.api.Test;
 import uk.gov.di.entity.Client;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,8 +28,8 @@ class ClientServiceTest {
 
     @Test
     void validatesRegisteredClientSuccessfully() {
-        boolean isValid =
-                CLIENT_SERVICE.isAuthorizationRequestValid(
+        AuthenticationResponse authenticationResponse =
+                CLIENT_SERVICE.validateAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("code"),
@@ -39,27 +39,29 @@ class ClientServiceTest {
                                 new Scope("email"),
                                 new State()));
 
-        assertTrue(isValid);
+        assertTrue(authenticationResponse.indicatesSuccess());
     }
 
     @Test
     void authorizationRequestInvalidIfClientNotRegistered() {
-        var clientService = new ClientService(Collections.emptyList());
-
-        boolean isValid =
-                clientService.isAuthorizationRequestValid(
+        AuthenticationResponse authenticationResponse =
+                CLIENT_SERVICE.validateAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("test"),
                                 new ResponseType(),
-                                new ClientID("not-a-client")));
+                                ResponseMode.FORM_POST,
+                                new ClientID("not-a-client"),
+                                URI.create("http://localhost:8080"),
+                                new Scope("openid"),
+                                new State()));
 
-        assertFalse(isValid);
+        assertFalse(authenticationResponse.indicatesSuccess());
     }
 
     @Test
     void authorizationRequestInvalidIfClientRequestsForbiddenScope() {
-        boolean isValid =
-                CLIENT_SERVICE.isAuthorizationRequestValid(
+        AuthenticationResponse authenticationResponse =
+                CLIENT_SERVICE.validateAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("code"),
@@ -69,13 +71,13 @@ class ClientServiceTest {
                                 new Scope("phone"),
                                 new State()));
 
-        assertFalse(isValid);
+        assertFalse(authenticationResponse.indicatesSuccess());
     }
 
     @Test
     void authorizationRequestInvalidIfClientRequestsForbiddenResponseType() {
-        boolean isValid =
-                CLIENT_SERVICE.isAuthorizationRequestValid(
+        AuthenticationResponse authenticationResponse =
+                CLIENT_SERVICE.validateAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("token"),
@@ -85,13 +87,13 @@ class ClientServiceTest {
                                 new Scope("email"),
                                 new State()));
 
-        assertFalse(isValid);
+        assertFalse(authenticationResponse.indicatesSuccess());
     }
 
     @Test
-    void authorizationRequestInvalidIfClientRequestsUnlistedRedirectUri() {
-        boolean isValid =
-                CLIENT_SERVICE.isAuthorizationRequestValid(
+    void authorizationRequestInvalidIfClientRequestContainsInvalidRedirectUri() {
+        AuthenticationResponse authenticationResponse =
+                CLIENT_SERVICE.validateAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("code"),
@@ -101,6 +103,6 @@ class ClientServiceTest {
                                 new Scope("email"),
                                 new State()));
 
-        assertFalse(isValid);
+        assertFalse(authenticationResponse.indicatesSuccess());
     }
 }
