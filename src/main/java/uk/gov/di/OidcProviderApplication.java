@@ -2,6 +2,8 @@ package uk.gov.di;
 
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -36,6 +38,10 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         bootstrap.addBundle(new AssetsBundle("/scripts", "/scripts", null, "js"));
         bootstrap.addBundle(new AssetsBundle("/assets/fonts", "/assets/fonts", null, "fonts"));
         bootstrap.addBundle(new AssetsBundle("/assets/images", "/assets/images", null, "images"));
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(
+                        bootstrap.getConfigurationSourceProvider(),
+                        new EnvironmentVariableSubstitutor(false)));
     }
 
     @Override
