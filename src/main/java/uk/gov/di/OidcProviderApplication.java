@@ -41,7 +41,6 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-        var postgresService = new PostgresService(configuration);
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var clientService =
