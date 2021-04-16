@@ -28,17 +28,17 @@ public class ClientService {
 
         var client = clientMaybe.get();
 
-        if (!client.getRedirectUris().contains(authRequest.getRedirectionURI().toString())) {
+        if (!client.redirectUris().contains(authRequest.getRedirectionURI().toString())) {
             return AuthenticationResponseHelper.generateErrorAuthnResponse(
                     authRequest, OAuth2Error.INVALID_REQUEST_URI);
         }
 
-        if (!client.getAllowedResponseTypes().contains(authRequest.getResponseType().toString())) {
+        if (!client.allowedResponseTypes().contains(authRequest.getResponseType().toString())) {
             return AuthenticationResponseHelper.generateErrorAuthnResponse(
                     authRequest, OAuth2Error.UNSUPPORTED_RESPONSE_TYPE);
         }
 
-        if (!client.getScopes().containsAll(authRequest.getScope().toStringList())) {
+        if (!client.scopes().containsAll(authRequest.getScope().toStringList())) {
             return AuthenticationResponseHelper.generateErrorAuthnResponse(
                     authRequest, OAuth2Error.INVALID_SCOPE);
         }
@@ -48,10 +48,10 @@ public class ClientService {
 
     public boolean isValidClient(String clientId, String clientSecret) {
         Optional<Client> client = getClient(clientId);
-        return client.isPresent() && client.get().getClientSecret().equals(clientSecret);
+        return client.isPresent() && client.get().clientSecret().equals(clientSecret);
     }
 
     private Optional<Client> getClient(String clientId) {
-        return clients.stream().filter(t -> t.getClientId().equals(clientId)).findFirst();
+        return clients.stream().filter(t -> t.clientId().equals(clientId)).findFirst();
     }
 }
