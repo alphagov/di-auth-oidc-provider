@@ -30,6 +30,7 @@ public class LoginResourceTest {
 
     private static final UserValidationService userValidationService =
             mock(UserValidationService.class);
+
     private static final ResourceExtension loginResource =
             ResourceExtension.builder()
                     .addResource(new LoginResource(userValidationService))
