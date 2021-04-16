@@ -14,7 +14,6 @@ import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
-import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserValidationService;
 
