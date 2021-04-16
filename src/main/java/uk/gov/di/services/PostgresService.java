@@ -30,8 +30,15 @@ public class PostgresService {
             if (postgresJsonNode.isArray()) {
                 for (JsonNode node : postgresJsonNode) {
                     JsonNode credentials = node.get("credentials");
-                    config.getDatabase().setUser(credentials.get("name").toString());
-                    config.getDatabase().setUrl(credentials.get("uri").toString());
+                    String uri =
+                            "jdbc:postgresql://"
+                                    + credentials.get("host").toString()
+                                    + ":"
+                                    + credentials.get("port").toString()
+                                    + "/"
+                                    + credentials.get("name").toString();
+                    config.getDatabase().setUrl(uri);
+                    config.getDatabase().setUser(credentials.get("username").toString());
                     config.getDatabase().setPassword(credentials.get("password").toString());
                 }
             }
