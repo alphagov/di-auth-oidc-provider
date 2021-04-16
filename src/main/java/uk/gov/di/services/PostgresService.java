@@ -31,13 +31,7 @@ public class PostgresService {
             if (postgresJsonNode.isArray()) {
                 for (JsonNode node : postgresJsonNode) {
                     JsonNode credentials = node.get("credentials");
-                    uri =
-                            "jdbc:postgresql://"
-                                    + credentials.get("host").toString()
-                                    + ":"
-                                    + credentials.get("port").toString()
-                                    + "/"
-                                    + credentials.get("name").toString();
+                    uri = credentials.get("jdbcuri").toString();
                     config.getDatabase().setUrl(uri);
                     config.getDatabase().setUser(credentials.get("username").toString());
                     config.getDatabase().setPassword(credentials.get("password").toString());
