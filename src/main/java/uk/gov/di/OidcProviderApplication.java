@@ -56,16 +56,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var clientService =
-                new ClientService(
-                        List.of(
-                                new Client(
-                                        "some_client_id",
-                                        "password",
-                                        List.of("openid", "profile", "email"),
-                                        List.of("code"),
-                                        List.of(
-                                                "https://di-auth-stub-relying-party.london.cloudapps.digital/oidc/callback",
-                                                "http://localhost:8081/oidc/callback"))));
+                new ClientService(clientConfigService.getClients());
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(new UserValidationService()));
         env.jersey().register(new UserInfoResource());
