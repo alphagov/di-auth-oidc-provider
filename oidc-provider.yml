@@ -9,6 +9,4 @@ issuer: di-auth-oidc-provider
 
 database:
   driverClass: org.postgresql.Driver
-  user: ${OIDC_PROVIDER_SQL_DB_USER:-user}
-  password: "${OIDC_PROVIDER_SQL_DB_PASSWORD:-password}"
   url: ${DATABASE_URL:-localhost}
