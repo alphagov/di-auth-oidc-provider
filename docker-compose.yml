@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  op-db:
+    image: "postgres:11-alpine@sha256:d706b23c20bb63f9408281e35beef25c6c01ddcd4712bf50101595bc9cfa9c8a"
+    ports:
+      - 15432:5432
+    restart: on-failure
+    command: postgres -c listen_addresses='*'
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: user
+      POSTGRES_DB: store
+    networks:
+      - op-net
+
+  psql:
+    image: "postgres:11-alpine@sha256:d706b23c20bb63f9408281e35beef25c6c01ddcd4712bf50101595bc9cfa9c8a"
+    command: psql
+    environment:
+      PGPASSWORD: pass
+      PGUSER: user
+      PGDATABASE: store
+      PGHOST: op-db
+      PGPORT: 5432
+    networks:
+      - op-net
+
+networks:
+  op-net:

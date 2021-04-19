@@ -9,4 +9,6 @@ issuer: di-auth-oidc-provider
 
 database:
   driverClass: org.postgresql.Driver
-  url: ${DATABASE_URL:-localhost}
+  url: ${DATABASE_URL:-jdbc:postgresql://localhost:15432/store}
+  user: user
+  password: pass
