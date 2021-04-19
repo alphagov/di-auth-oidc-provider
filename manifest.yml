@@ -5,6 +5,8 @@ applications:
     memory: 1G
     buildpack: java_buildpack
     command: cd di-auth-oidc-provider && bin/di-auth-oidc-provider server ./oidc-provider.yml
+    services:
+      - client-store
     env:
       JAVA_HOME: "../.java-buildpack/open_jdk_jre"
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 16.+}}'

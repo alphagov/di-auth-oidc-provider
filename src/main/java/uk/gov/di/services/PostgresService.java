@@ -3,19 +3,24 @@ package uk.gov.di.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
+
+import static java.text.MessageFormat.format;
 
 public class PostgresService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PostgresService.class);
     private OidcProviderConfiguration config;
     private String uri;
 
     public PostgresService(OidcProviderConfiguration config) {
         this.config = config;
-        startup(config);
+        startup();
     }
 
-    public void startup(OidcProviderConfiguration config) {
+    private void startup() {
         String vcap = System.getenv("VCAP_SERVICES");
         if (vcap != null && vcap.length() > 0) {
             setPostgresCredentialsFromVcap(vcap);
@@ -31,10 +36,19 @@ public class PostgresService {
             if (postgresJsonNode.isArray()) {
                 for (JsonNode node : postgresJsonNode) {
                     JsonNode credentials = node.get("credentials");
-                    uri = credentials.get("jdbcuri").toString();
+                    String uri =
+                            format(
+                                    "jdbc:postgresql://{0}:{1}/{2}",
+                                    credentials.get("host").asText(),
+                                    credentials.get("port").asText(),
+                                    credentials.get("name").asText());
                     config.getDatabase().setUrl(uri);
-                    config.getDatabase().setUser(credentials.get("username").toString());
-                    config.getDatabase().setPassword(credentials.get("password").toString());
+
+                    config.getDatabase().setUser(credentials.get("username").asText());
+                    LOG.info("Database username: " + credentials.get("username").asText());
+
+                    config.getDatabase().setPassword(credentials.get("password").asText());
+                    LOG.info("Database URI: " + uri);
                 }
             }
         } catch (JsonProcessingException e) {

@@ -8,6 +8,8 @@ import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.entity.Client;
 import uk.gov.di.resources.AuthorisationResource;
@@ -23,6 +25,9 @@ import uk.gov.di.services.UserValidationService;
 import java.util.List;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OidcProviderApplication.class);
+
     public static void main(String[] args) throws Exception {
         new OidcProviderApplication().run(args);
     }
@@ -48,7 +53,6 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
         PostgresService postgresService = new PostgresService(configuration);
-        configuration.getDatabase().setUrl(postgresService.getUri());
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var clientService =
