@@ -1,7 +1,5 @@
 package uk.gov.di.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.entity.VcapServices;
 
@@ -9,9 +7,7 @@ import static java.text.MessageFormat.format;
 
 public class PostgresService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PostgresService.class);
     private OidcProviderConfiguration config;
-    private String uri;
 
     public PostgresService(OidcProviderConfiguration config) {
         this.config = config;
@@ -34,9 +30,5 @@ public class PostgresService {
         config.getDatabase().setUrl(uri);
         config.getDatabase().setUser(credentials.username());
         config.getDatabase().setPassword(credentials.password());
-    }
-
-    public String getUri() {
-        return uri;
     }
 }
