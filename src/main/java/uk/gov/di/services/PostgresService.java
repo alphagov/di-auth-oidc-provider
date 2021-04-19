@@ -1,11 +1,9 @@
 package uk.gov.di.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
+import uk.gov.di.entity.VcapServices;
 
 import static java.text.MessageFormat.format;
 
@@ -28,32 +26,14 @@ public class PostgresService {
     }
 
     private void setPostgresCredentialsFromVcap(String vcap) {
+        var credentials = VcapServices.readPostgresConfiguration(vcap).orElseThrow();
 
-        try {
-            var objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(vcap);
-            JsonNode postgresJsonNode = jsonNode.get("postgres");
-            if (postgresJsonNode.isArray()) {
-                for (JsonNode node : postgresJsonNode) {
-                    JsonNode credentials = node.get("credentials");
-                    String uri =
-                            format(
-                                    "jdbc:postgresql://{0}:{1}/{2}",
-                                    credentials.get("host").asText(),
-                                    credentials.get("port").asText(),
-                                    credentials.get("name").asText());
-                    config.getDatabase().setUrl(uri);
+        String uri = format("jdbc:postgresql://{0}:{1}/{2}",
+                        credentials.host(), credentials.port(), credentials.name());
 
-                    config.getDatabase().setUser(credentials.get("username").asText());
-                    LOG.info("Database username: " + credentials.get("username").asText());
-
-                    config.getDatabase().setPassword(credentials.get("password").asText());
-                    LOG.info("Database URI: " + uri);
-                }
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        config.getDatabase().setUrl(uri);
+        config.getDatabase().setUser(credentials.username());
+        config.getDatabase().setPassword(credentials.password());
     }
 
     public String getUri() {
