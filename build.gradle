@@ -57,3 +57,9 @@ mainClassName = 'uk.gov.di.OidcProviderApplication'
 run {
     args = ['server', 'oidc-provider.yml']
 }
+
+task cfPush(type: Exec) {
+    commandLine 'cf', 'push', 'di-auth-oidc-provider', '-p', 'build/distributions/di-auth-oidc-provider.zip'
+}
+
+cfPush.dependsOn build
