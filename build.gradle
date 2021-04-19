@@ -26,7 +26,8 @@ def dependencyVersions = [
         nimbus_oauth2_sdk: '9.3.1',
         nimbus_jose_jwt: '9.8.1',
         junit_version: '5.6.0',
-        mockito_version: '3.9.0'
+        mockito_version: '3.9.0',
+        jdbi_version: '3.19.0'
 ]
 
 dependencies {
@@ -37,7 +38,8 @@ dependencies {
             "io.dropwizard:dropwizard-views-mustache:${dependencyVersions.dropwizard}",
             "io.dropwizard:dropwizard-assets:${dependencyVersions.dropwizard}",
             "io.dropwizard:dropwizard-jdbi3:${dependencyVersions.dropwizard}",
-            "org.postgresql:postgresql:42.2.19"
+            "org.jdbi:jdbi3-postgres:${dependencyVersions.jdbi_version}",
+            "org.jdbi:jdbi3-jackson2:${dependencyVersions.jdbi_version}"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}",
         "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}",
