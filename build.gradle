@@ -1,22 +1,8 @@
-plugins {
-    id "com.diffplug.spotless" version "5.12.1"
-}
-
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
 
 group 'uk.gov.di'
-
-spotless {
-    java {
-        target '**/*.java'
-        googleJavaFormat('1.9').aosp()
-        importOrder '', 'javax', 'java', '\\#'
-    }
-}
-
-compileJava.dependsOn 'spotlessApply'
 
 repositories {
     mavenCentral()
