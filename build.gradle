@@ -42,6 +42,10 @@ dependencies {
             "org.jdbi:jdbi3-jackson2:${dependencyVersions.jdbi_version}",
             "org.postgresql:postgresql:42.2.19"
 
+    constraints {
+        implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'
+    }
+
     testImplementation "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}",
         "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}",
             "org.mockito:mockito-core:${dependencyVersions.mockito_version}",
