@@ -8,6 +8,8 @@ import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
+import org.jdbi.v3.postgres.PostgresPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
@@ -54,6 +56,8 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     public void run(OidcProviderConfiguration configuration, Environment env) {
         PostgresService postgresService = new PostgresService(configuration);
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
+        jdbiFactory.installPlugin(new PostgresPlugin());
+        jdbiFactory.installPlugin(new Jackson2Plugin());
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var clientService =
                 new ClientService(clientConfigService.getClients());
