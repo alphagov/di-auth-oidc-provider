@@ -21,7 +21,7 @@ public class VcapServices {
     public record Service(Credentials credentials) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Credentials(String host, int port, String name, String username, String password) {}
+    public record Credentials(String host, String port, String name, String username, String password) {}
 
     public static Optional<Credentials> readPostgresConfiguration(String vcapServices) {
         try {
