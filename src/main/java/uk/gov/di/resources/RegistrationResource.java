@@ -35,18 +35,13 @@ public class RegistrationResource {
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Path("/validate")
-    public Response setPassword(@FormParam("email") @NotNull String email,
+    public View setPassword(@FormParam("email") @NotNull String email,
                                 @FormParam("password") @NotNull String password,
                                 @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
-            return Response.ok(new SuccessfulRegistration()).build();
+            return new SuccessfulRegistration();
         } else {
-            URI destination =
-                    UriBuilder.fromUri(URI.create("/registration"))
-                            .queryParam("failedRegistration", true)
-                            .build();
-
-            return Response.status(302).location(destination).build();
+            return new SetPasswordView(email, true);
         }
     }
 
