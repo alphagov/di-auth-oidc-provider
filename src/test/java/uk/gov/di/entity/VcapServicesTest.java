@@ -11,7 +11,7 @@ class VcapServicesTest {
 
         var input = """
         {
-            "postgresql": [
+            "postgres": [
                 {
                     "credentials": {
                         "name": "database-name",
@@ -46,7 +46,7 @@ class VcapServicesTest {
 
     @Test
     void handlesEmptyPostgresKey() {
-        assertTrue(VcapServices.readPostgresConfiguration("{'postgresql': []}").isEmpty());
+        assertTrue(VcapServices.readPostgresConfiguration("{'postgres': []}").isEmpty());
     }
 
     @Test
@@ -54,7 +54,7 @@ class VcapServicesTest {
         var input = """
         {
             "some-other-field": [],
-            "postgresql": [{
+            "postgres": [{
                 "some-other-field": "other-value",
                 "credentials": {
                     "name": "database-name",
@@ -75,7 +75,7 @@ class VcapServicesTest {
     void requiresAllFieldsToBePresent() {
         var input = """
         {
-            "postgresql": [{
+            "postgres": [{
                 "credentials": {
                     "name": "database-name"
                 }
