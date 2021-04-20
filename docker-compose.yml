@@ -6,11 +6,30 @@ services:
     ports:
       - 15432:5432
     restart: on-failure
+    healthcheck:
+      test: pg_isready
+      interval: 5s
+      timeout: 3m
     command: postgres -c listen_addresses='*'
     environment:
       POSTGRES_PASSWORD: pass
       POSTGRES_USER: user
       POSTGRES_DB: store
+    networks:
+      - op-net
+
+  flyway:
+    image: flyway/flyway:6.2.1@sha256:8718ddb67cbd8e2b77af0fe50db7ce05bb8d6ed2b2a5aea432b4062990170be2
+    environment:
+      FLYWAY_URL: jdbc:postgresql://op-db:5432/store
+      FLYWAY_USER: user
+      FLYWAY_PASSWORD: pass
+      FLYWAY_MIXED: "true"
+    volumes:
+      - ./sql:/flyway/sql
+    command:
+      ["migrate", "-locations=filesystem:/flyway/sql"]
+    restart: on-failure
     networks:
       - op-net
 
