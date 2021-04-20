@@ -16,7 +16,7 @@ class VcapServicesTest {
                     "credentials": {
                         "name": "database-name",
                         "host": "database-host",
-                        "port": "1234",
+                        "port": 1234,
                         "username": "database-username",
                         "password": "database-password"
                     }
@@ -29,7 +29,7 @@ class VcapServicesTest {
 
         assertEquals(credentials.name(), "database-name");
         assertEquals(credentials.host(), "database-host");
-        assertEquals(credentials.port(), 1234);
+        assertEquals(credentials.port(), "1234");
         assertEquals(credentials.username(), "database-username");
         assertEquals(credentials.password(), "database-password");
     }
@@ -59,7 +59,7 @@ class VcapServicesTest {
                 "credentials": {
                     "name": "database-name",
                     "host": "database-host",
-                    "port": "1234",
+                    "port": 1234,
                     "username": "database-username",
                     "password": "database-password",
                     "some-other-field": "other-value"
