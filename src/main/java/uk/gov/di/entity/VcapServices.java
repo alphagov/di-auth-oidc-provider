@@ -28,11 +28,11 @@ public class VcapServices {
                     new TypeReference<Map<String, List<Service>>>() {}
                 );
 
-            if (services == null || !services.containsKey("postgresql")) {
+            if (services == null || !services.containsKey("postgres")) {
                 return Optional.empty();
             }
 
-            return services.get("postgresql").stream().findFirst().map(Service::credentials);
+            return services.get("postgres").stream().findFirst().map(Service::credentials);
 
         } catch (JsonProcessingException e) {
             return Optional.empty();
