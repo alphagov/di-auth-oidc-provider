@@ -8,6 +8,7 @@ import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
+import org.glassfish.jersey.server.ServerProperties;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.slf4j.Logger;
@@ -67,5 +68,6 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey().register(new UserInfoResource());
         env.jersey().register(new TokenResource(new TokenService(configuration), clientService));
         env.jersey().register(new RegistrationResource());
+        env.jersey().property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
     }
 }
