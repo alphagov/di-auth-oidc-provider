@@ -67,10 +67,7 @@ public class LoginResource {
             @FormParam("authRequest") String authRequest,
             @FormParam("email") String email,
             @FormParam("password") String password) {
-        boolean isValid = userValidationService.isValidUser(email, password);
-
-        AuthenticationResultType login = cognitoService.login(email, password);
-        LOG.info("AuthenticationResultType:" + login.toString());
+        boolean isValid = cognitoService.login(email, password);
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest)).build();
