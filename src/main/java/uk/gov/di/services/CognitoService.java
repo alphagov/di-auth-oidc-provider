@@ -1,5 +1,7 @@
 package uk.gov.di.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
@@ -12,9 +14,11 @@ import java.util.LinkedHashMap;
 
 public class CognitoService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CognitoService.class);
+
     private CognitoIdentityProviderClient cognitoClient;
     //ClientId of the userpool in Cognito
-    private final String clientId = "34kbs94nemtjf3or5vhag42m9b";
+    private final String clientId = "3pf8i39bspmlkmd9pqo1s626oe";
     private final String userPoolId = "eu-west-2_JVIkRJSaV";
 
     public CognitoService(CognitoIdentityProviderClient cognitoClient) {
@@ -37,6 +41,7 @@ public class CognitoService {
         LinkedHashMap<String, String> authParams = new LinkedHashMap<>();
         authParams.put("USERNAME", email);
         authParams.put("PASSWORD", password);
+
         AdminInitiateAuthRequest authRequest = AdminInitiateAuthRequest.builder()
                 .authFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
                 .userPoolId(userPoolId)
@@ -46,6 +51,8 @@ public class CognitoService {
 
         AdminInitiateAuthResponse authResult = cognitoClient.adminInitiateAuth(authRequest);
         AuthenticationResultType authenticationResult = authResult.authenticationResult();
+
+        LOG.info("authResult: " + authResult.toString());
 
         return authenticationResult;
     }

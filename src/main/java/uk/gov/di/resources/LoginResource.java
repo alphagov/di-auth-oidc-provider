@@ -4,7 +4,6 @@ import io.dropwizard.views.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
-import uk.gov.di.OidcProviderApplication;
 import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.UserValidationService;
 import uk.gov.di.views.LoginView;
@@ -23,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
 import java.net.URI;
 
 @Path("/login")
@@ -72,7 +70,7 @@ public class LoginResource {
         boolean isValid = userValidationService.isValidUser(email, password);
 
         AuthenticationResultType login = cognitoService.login(email, password);
-        LOG.info("AuthenticationResultType:" + login.tokenType());
+        LOG.info("AuthenticationResultType:" + login.toString());
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest)).build();
