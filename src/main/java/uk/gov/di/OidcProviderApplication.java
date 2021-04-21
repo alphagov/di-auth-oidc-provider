@@ -13,14 +13,10 @@ import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.nodes.CollectionNode;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProviderChain;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.cognitoidentity.CognitoIdentityClient;
-import software.amazon.awssdk.services.cognitoidentity.CognitoIdentityClientBuilder;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.resources.AuthorisationResource;
@@ -65,11 +61,9 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-        AwsCredentialsProvider credentialsProvider =  StaticCredentialsProvider.create(
-                AwsBasicCredentials.create("", ""));
         CognitoIdentityProviderClient cognitoIdentityClient = CognitoIdentityProviderClient.builder()
                 .region(Region.EU_WEST_2)
-                .credentialsProvider(credentialsProvider)
+                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                 .build();
 
         CognitoService cognitoService = new CognitoService(cognitoIdentityClient);
