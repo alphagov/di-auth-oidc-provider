@@ -3,7 +3,6 @@ package uk.gov.di.resources;
 import io.dropwizard.views.View;
 import org.apache.http.HttpStatus;
 import uk.gov.di.views.SetPasswordView;
-import uk.gov.di.views.SuccessfulLoginView;
 import uk.gov.di.views.SuccessfulRegistration;
 
 import javax.validation.constraints.NotNull;
@@ -12,9 +11,10 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 @Path("/registration")
@@ -46,7 +46,19 @@ public class RegistrationResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response validateLogin(
             @FormParam("authRequest") String authRequest) {
-        return Response.ok(new SuccessfulLoginView(authRequest)).build();
+        return Response.status(Response.Status.FOUND)
+                .location(URI.create("/authorize?" + authRequest))
+                .cookie(
+                        new NewCookie(
+                                "userCookie",
+                                "dummy",
+                                "/",
+                                null,
+                                Cookie.DEFAULT_VERSION,
+                                null,
+                                NewCookie.DEFAULT_MAX_AGE,
+                                false))
+                .build();
     }
 
 }
