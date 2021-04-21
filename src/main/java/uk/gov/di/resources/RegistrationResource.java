@@ -18,20 +18,21 @@ public class RegistrationResource {
 
     @POST
     @Produces(MediaType.TEXT_HTML)
-    public View setPassword(@FormParam("email") @NotNull String email) {
-        return new SetPasswordView(email);
+    public View setPassword(@FormParam("authRequest") String authRequest, @FormParam("email") @NotNull String email) {
+        return new SetPasswordView(email, authRequest);
     }
 
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Path("/validate")
-    public Response setPassword(@FormParam("email") @NotNull String email,
+    public Response setPassword(@FormParam("authRequest") String authRequest,
+                                @FormParam("email") @NotNull String email,
                                 @FormParam("password") @NotNull String password,
                                 @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
-            return Response.ok(new SuccessfulRegistration()).build();
+            return Response.ok(new SuccessfulRegistration(authRequest)).build();
         } else {
-            return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new SetPasswordView(email, true)).build();
+            return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new SetPasswordView(email, authRequest, true)).build();
         }
     }
 }

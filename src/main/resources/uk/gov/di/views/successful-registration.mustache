@@ -8,6 +8,7 @@
                 </h1>
                 <br />
                 <form class="form" action="/login/continue" method="post">
+                    <input type="hidden" value="{{authRequest}}" name="authRequest">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
                 </form>
             </div>

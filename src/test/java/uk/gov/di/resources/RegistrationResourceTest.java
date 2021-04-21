@@ -50,6 +50,7 @@ class RegistrationResourceTest {
 
     private Response setPasswordRequest(String email, String password, String passwordConfirm) {
         MultivaluedMap<String, String> setPasswordResourceFormParams = new MultivaluedHashMap<>();
+        setPasswordResourceFormParams.add("authRequest", "whatever");
         setPasswordResourceFormParams.add("email", email);
         setPasswordResourceFormParams.add("password", password);
         setPasswordResourceFormParams.add("password-confirm", passwordConfirm);
