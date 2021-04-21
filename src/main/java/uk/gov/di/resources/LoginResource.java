@@ -41,7 +41,7 @@ public class LoginResource {
     @POST
     public Response login(
             @FormParam("submit") String buttonValue, @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
-        if (buttonValue.equals("login")) {
+        if (buttonValue.equals("sign-in")) {
             return Response.ok(new PasswordView(authRequest, email)).build();
         }
         else {
