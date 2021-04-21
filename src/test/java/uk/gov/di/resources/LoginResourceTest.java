@@ -69,6 +69,37 @@ public class LoginResourceTest {
         assertEquals("/login", response.getLocation().getPath());
     }
 
+    @Test
+    void shouldDisplayPasswordScreenIfUserClicksSignIn() {
+        MultivaluedMap<String, String> loginResourceFormParams = new MultivaluedHashMap<>();
+        loginResourceFormParams.add("authRequest", "whatever");
+        loginResourceFormParams.add("email", "joe.bloggs@digital.cabinet-office.gov.uk");
+        loginResourceFormParams.add("submit", "sign-in");
+
+        final Response response = loginResource
+                .target("/login")
+                .request()
+                .post(Entity.form(loginResourceFormParams));
+
+        assertEquals(HttpStatus.SC_OK, response.getStatus());
+    }
+
+    @Test
+    void shouldRedirectToRegistrationScreenIfUserClicksSignIn() {
+        MultivaluedMap<String, String> loginResourceFormParams = new MultivaluedHashMap<>();
+        loginResourceFormParams.add("authRequest", "whatever");
+        loginResourceFormParams.add("email", "joe.bloggs@digital.cabinet-office.gov.uk");
+        loginResourceFormParams.add("submit", "register");
+
+        final Response response = loginResource
+                .target("/login")
+                .request()
+                .post(Entity.form(loginResourceFormParams));
+
+        assertEquals(HttpStatus.SC_TEMPORARY_REDIRECT, response.getStatus());
+        assertEquals("/registration", response.getLocation().getPath());
+    }
+
     private Response loginRequest(String email, String password) {
         MultivaluedMap<String, String> loginResourceFormParams = new MultivaluedHashMap<>();
         loginResourceFormParams.add("authRequest", "whatever");

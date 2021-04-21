@@ -1,0 +1,17 @@
+{{<layout}}
+    {{$title}}Sign-in to GOV.UK - Success{{/title}}
+    {{$mainContent}}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">
+                    You have successfully registered your account
+                </h1>
+                <br />
+                <form class="form" action="/login/continue" method="post">
+                    <input type="hidden" value="{{authRequest}}" name="authRequest">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+                </form>
+            </div>
+        </div>
+    {{/mainContent}}
+{{/layout}}

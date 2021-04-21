@@ -39,9 +39,18 @@ public class LoginResource {
     }
 
     @POST
-    public View login(
-            @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
-        return new PasswordView(authRequest, email);
+    public Response login(
+            @FormParam("submit") String buttonValue, @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
+        if (buttonValue.equals("sign-in")) {
+            return Response.ok(new PasswordView(authRequest, email)).build();
+        }
+        else {
+            URI destination =
+                    UriBuilder.fromUri(URI.create("/registration"))
+                            .build();
+
+            return Response.status(Response.Status.TEMPORARY_REDIRECT).location(destination).build();
+        }
     }
 
     @POST
