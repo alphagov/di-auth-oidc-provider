@@ -27,4 +27,14 @@ public class UserValidationServiceTest {
                 userValidationService.isValidUser(
                         "joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
     }
+
+    @Test
+    public void shouldValidateThatUserExists() {
+        assertTrue(userValidationService.userExists("joe.bloggs@digital.cabinet-office.gov.uk"));
+    }
+
+    @Test
+    public void shouldValidateThatUserDoesNotExists() {
+        assertFalse(userValidationService.userExists("unknown@nowhere"));
+    }
 }

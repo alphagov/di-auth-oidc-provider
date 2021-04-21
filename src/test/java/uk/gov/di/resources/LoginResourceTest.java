@@ -16,7 +16,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,8 +47,10 @@ public class LoginResourceTest {
     static void setUp() {
         when(userValidationService.isValidUser(anyString(), anyString())).thenReturn(false);
         when(userValidationService.isValidUser(
-                        eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
+                eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
                 .thenReturn(true);
+        when(userValidationService.userExists(anyString())).thenReturn(false);
+        when(userValidationService.userExists(eq("joe.bloggs@digital.cabinet-office.gov.uk"))).thenReturn(true);
     }
 
     @Test
@@ -70,7 +71,7 @@ public class LoginResourceTest {
     }
 
     @Test
-    void shouldDisplayPasswordScreenIfUserClicksSignIn() {
+    void shouldDisplayPasswordScreenIfUserExists() {
         MultivaluedMap<String, String> loginResourceFormParams = new MultivaluedHashMap<>();
         loginResourceFormParams.add("authRequest", "whatever");
         loginResourceFormParams.add("email", "joe.bloggs@digital.cabinet-office.gov.uk");
@@ -85,11 +86,10 @@ public class LoginResourceTest {
     }
 
     @Test
-    void shouldRedirectToRegistrationScreenIfUserClicksSignIn() {
+    void shouldRedirectToRegistrationScreenIfNonExistentUser() {
         MultivaluedMap<String, String> loginResourceFormParams = new MultivaluedHashMap<>();
         loginResourceFormParams.add("authRequest", "whatever");
-        loginResourceFormParams.add("email", "joe.bloggs@digital.cabinet-office.gov.uk");
-        loginResourceFormParams.add("submit", "register");
+        loginResourceFormParams.add("email", "notexists@digital.cabinet-office.gov.uk");
 
         final Response response = loginResource
                 .target("/login")
