@@ -44,7 +44,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     public void initialize(Bootstrap<OidcProviderConfiguration> bootstrap) {
         bootstrap.addBundle(new ViewBundle<>());
         bootstrap.addBundle(new AssetsBundle("/css", "/css", null, "css"));
-        bootstrap.addBundle(new AssetsBundle("/scripts", "/scripts", null, "js"));
+        bootstrap.addBundle(new AssetsBundle("/js", "/js", null, "js"));
         bootstrap.addBundle(new AssetsBundle("/assets/fonts", "/assets/fonts", null, "fonts"));
         bootstrap.addBundle(new AssetsBundle("/assets/images", "/assets/images", null, "images"));
         bootstrap.setConfigurationSourceProvider(
