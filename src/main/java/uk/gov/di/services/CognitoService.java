@@ -37,7 +37,7 @@ public class CognitoService {
         //Assuming we don't need to confirm sign up with confirmation code
     }
 
-    public AuthenticationResultType login(String email, String password) {
+    public boolean login(String email, String password) {
         LinkedHashMap<String, String> authParams = new LinkedHashMap<>();
         authParams.put("USERNAME", email);
         authParams.put("PASSWORD", password);
@@ -49,11 +49,18 @@ public class CognitoService {
                 .authParameters(authParams)
                 .build();
 
-        AdminInitiateAuthResponse authResult = cognitoClient.adminInitiateAuth(authRequest);
-        AuthenticationResultType authenticationResult = authResult.authenticationResult();
+        try {
+            AdminInitiateAuthResponse authResult = cognitoClient.adminInitiateAuth(authRequest);
+            AuthenticationResultType authenticationResult = authResult.authenticationResult();
 
-        LOG.info("authResult: " + authResult.toString());
+            LOG.info("authResult: " + authResult.toString());
+            LOG.info("authenticationResult: " + authenticationResult.toString());
 
-        return authenticationResult;
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return false;
+        }
+
+        return true;
     }
 }

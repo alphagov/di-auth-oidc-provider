@@ -4,7 +4,6 @@ import io.dropwizard.views.View;
 import uk.gov.di.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
 import uk.gov.di.services.CognitoService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
@@ -69,8 +68,7 @@ public class LoginResource {
             @FormParam("password") String password) {
         boolean isValid = userService.isValidUser(email, password);
 
-        AuthenticationResultType login = cognitoService.login(email, password);
-        LOG.info("AuthenticationResultType:" + login.toString());
+        boolean isValidCongito = cognitoService.login(email, password);
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest))
