@@ -18,6 +18,11 @@ function wait_for_docker_services() {
   return 0
 }
 
+echo "Authenticating to AWS account digital-identity-dev using gds-users for Cognito access..."
+
+# Populate AWS credentials in environment variables to call Cognito
+eval $(gds-cli aws digital-identity-dev -e)
+
 ./gradlew installDist
 
 docker-compose down || true
