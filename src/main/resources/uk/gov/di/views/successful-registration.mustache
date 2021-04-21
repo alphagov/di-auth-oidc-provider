@@ -3,11 +3,38 @@
     {{$mainContent}}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l">
-                    You have successfully registered your account
-                </h1>
+
+                <div class="govuk-panel govuk-panel--confirmation orange-bg">
+                    <h1 class="govuk-panel__title">
+                        You have successfully created your GOV.UK Account
+                    </h1>
+
+                </div>
+
                 <br />
-                <form class="form" action="/login/continue" method="post">
+
+                <p>
+                    A GOV.UK Account will:
+                </p>
+
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>
+                        let you reuse and share your data to ensure that government services are quicker to interact with
+                    </li>
+                    <li>
+                        suggest GOV.UK guidance and information that is relevant to you
+                    </li>
+                    <li>
+                        tell you when content you're interested in has been updated
+                    </li>
+                    <li>
+                        help you set up reminders for tasks you may need to complete later
+                    </li>
+                </ul>
+
+                <br />
+
+                <form class="form" action="/registration/continue" method="post">
                     <input type="hidden" value="{{authRequest}}" name="authRequest">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
                 </form>
