@@ -1,6 +1,11 @@
 package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
+import uk.gov.di.OidcProviderApplication;
+import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.UserValidationService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
@@ -25,9 +30,13 @@ import java.net.URI;
 public class LoginResource {
 
     private UserValidationService userValidationService;
+    private CognitoService cognitoService;
 
-    public LoginResource(UserValidationService userValidationService) {
+    private static final Logger LOG = LoggerFactory.getLogger(LoginResource.class);
+
+    public LoginResource(UserValidationService userValidationService, CognitoService cognitoService) {
         this.userValidationService = userValidationService;
+        this.cognitoService = cognitoService;
     }
 
     @GET
@@ -61,6 +70,9 @@ public class LoginResource {
             @FormParam("email") String email,
             @FormParam("password") String password) {
         boolean isValid = userValidationService.isValidUser(email, password);
+
+        AuthenticationResultType login = cognitoService.login(email, password);
+        LOG.info("AuthenticationResultType:" + login.tokenType());
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest)).build();

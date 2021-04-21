@@ -40,7 +40,9 @@ dependencies {
             "io.dropwizard:dropwizard-jdbi3:${dependencyVersions.dropwizard}",
             "org.jdbi:jdbi3-postgres:${dependencyVersions.jdbi_version}",
             "org.jdbi:jdbi3-jackson2:${dependencyVersions.jdbi_version}",
-            "org.postgresql:postgresql:42.2.19"
+            "org.postgresql:postgresql:42.2.19",
+            "software.amazon.awssdk:cognitoidentityprovider:2.16.43",
+            "software.amazon.awssdk:cognitoidentity:2.16.43"
 
     constraints {
         implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'

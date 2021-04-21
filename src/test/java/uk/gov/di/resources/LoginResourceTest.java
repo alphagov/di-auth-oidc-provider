@@ -10,6 +10,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.UserValidationService;
 
 import javax.ws.rs.client.Entity;
@@ -30,9 +31,11 @@ public class LoginResourceTest {
     private static final UserValidationService userValidationService =
             mock(UserValidationService.class);
 
+    private static final CognitoService cognitoService = mock(CognitoService.class);
+
     private static final ResourceExtension loginResource =
             ResourceExtension.builder()
-                    .addResource(new LoginResource(userValidationService))
+                    .addResource(new LoginResource(userValidationService, cognitoService))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);

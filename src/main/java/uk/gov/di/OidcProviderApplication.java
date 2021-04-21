@@ -13,6 +13,15 @@ import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.nodes.CollectionNode;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProviderChain;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.cognitoidentity.CognitoIdentityClient;
+import software.amazon.awssdk.services.cognitoidentity.CognitoIdentityClientBuilder;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.entity.Client;
 import uk.gov.di.resources.AuthorisationResource;
@@ -22,11 +31,10 @@ import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
+import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserValidationService;
-
-import java.util.List;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
@@ -56,6 +64,15 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
+        AwsCredentialsProvider credentialsProvider =  StaticCredentialsProvider.create(
+                AwsBasicCredentials.create("", ""));
+        CognitoIdentityProviderClient cognitoIdentityClient = CognitoIdentityProviderClient.builder()
+                .region(Region.EU_WEST_2)
+                .credentialsProvider(credentialsProvider)
+                .build();
+
+        CognitoService cognitoService = new CognitoService(cognitoIdentityClient);
+
         PostgresService postgresService = new PostgresService(configuration);
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
         jdbiFactory.installPlugin(new PostgresPlugin());
@@ -64,7 +81,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var clientService =
                 new ClientService(clientConfigService.getClients());
         env.jersey().register(new AuthorisationResource(clientService));
-        env.jersey().register(new LoginResource(new UserValidationService()));
+        env.jersey().register(new LoginResource(new UserValidationService(), cognitoService));
         env.jersey().register(new UserInfoResource());
         env.jersey().register(new TokenResource(new TokenService(configuration), clientService));
         env.jersey().register(new RegistrationResource());
