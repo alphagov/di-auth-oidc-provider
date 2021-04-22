@@ -1,6 +1,28 @@
+plugins {
+    id "com.avast.gradle.docker-compose" version "0.14.3"
+}
+
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
+apply plugin: 'com.avast.gradle.docker-compose'
+
+dockerCompose {
+    buildBeforeUp = true
+    forceRecreate = true
+    startedServices = [
+            'op-db',
+            'flyway',
+    ]
+    def logDir = new File(project.buildDir, "logs")
+    if (!logDir.exists()) {
+        println("creating logs folder...")
+        logDir.mkdir()
+    }
+    captureContainersOutput = false
+    captureContainersOutputToFile = new File('logs', 'docker-compose-gradle.log')
+    projectName = "di-auth-oidc-provider"
+}
 
 group 'uk.gov.di'
 
@@ -70,3 +92,4 @@ task cfPush(type: Exec) {
 }
 
 cfPush.dependsOn build
+rootProject.dockerCompose.isRequiredBy(run)
