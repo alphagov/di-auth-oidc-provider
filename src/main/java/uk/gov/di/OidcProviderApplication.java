@@ -63,10 +63,12 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var clientService =
                 new ClientService(clientConfigService.getClients(), authorizationCodeService);
         var userService = new UserService();
+        var tokenService = new TokenService(configuration);
+
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(userService));
-        env.jersey().register(new UserInfoResource());
-        env.jersey().register(new TokenResource(new TokenService(configuration), clientService, authorizationCodeService));
+        env.jersey().register(new UserInfoResource(tokenService));
+        env.jersey().register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new RegistrationResource(userService));
         env.jersey().property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
     }

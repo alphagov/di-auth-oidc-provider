@@ -6,6 +6,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.openid.connect.sdk.claims.Gender;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import org.apache.http.HttpStatus;
+import uk.gov.di.services.TokenService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -16,6 +17,12 @@ import javax.ws.rs.core.Response;
 
 @Path("/userinfo")
 public class UserInfoResource {
+
+    private final TokenService tokenService;
+
+    public UserInfoResource(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
