@@ -7,6 +7,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
+import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
 
@@ -22,12 +23,14 @@ import javax.ws.rs.core.Response;
 @Path("/token")
 public class TokenResource {
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
     private final ClientService clientService;
+    private final AuthorizationCodeService authorizationCodeService;
 
-    public TokenResource(TokenService tokenService, ClientService clientService) {
+    public TokenResource(TokenService tokenService, ClientService clientService, AuthorizationCodeService authorizationCodeService) {
         this.tokenService = tokenService;
         this.clientService = clientService;
+        this.authorizationCodeService = authorizationCodeService;
     }
 
     @POST

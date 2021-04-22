@@ -6,6 +6,7 @@ import io.dropwizard.testing.junit5.ResourceExtension;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
 
@@ -23,11 +24,12 @@ import static org.mockito.Mockito.when;
 public class TokenResourceTest {
 
     private static final TokenService tokenService = mock(TokenService.class);
+    private static final AuthorizationCodeService authCodeService = mock(AuthorizationCodeService.class);
     private static final ClientService clientService = mock(ClientService.class);
     private static final SignedJWT signedJWT = mock(SignedJWT.class);
     private static final ResourceExtension tokenResourceExtension =
             ResourceExtension.builder()
-                    .addResource(new TokenResource(tokenService, clientService))
+                    .addResource(new TokenResource(tokenService, clientService, authCodeService))
                     .build();
 
     @Test
