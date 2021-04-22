@@ -5,12 +5,17 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpResponse;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class CognitoService {
 
@@ -27,14 +32,41 @@ public class CognitoService {
 
     public SignUpResponse signUp(String email, String password) {
         //https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html
+
+        List<AttributeType> attributes = new ArrayList<>();
+        attributes.add(AttributeType.builder()
+                .name("email")
+                .value(email)
+                .build());
+
         SignUpRequest request = SignUpRequest.builder()
                 .clientId(clientId)
                 .username(email)
                 .password(password)
+                .userAttributes(attributes)
                 .build();
+
         SignUpResponse signUpResponse = cognitoClient.signUp(request);
+        LOG.info("signUpResponse: ", signUpResponse.toString());
         return signUpResponse;
-        //Assuming we don't need to confirm sign up with confirmation code
+    }
+
+    public boolean VerifyAccessCode(String username, String code) {
+        ConfirmSignUpRequest confirmSignUpRequest =
+                ConfirmSignUpRequest.builder()
+                        .clientId(clientId)
+                        .username(username)
+                        .confirmationCode(code)
+                        .build();
+
+        try {
+            ConfirmSignUpResponse confirmSignUpResponse = cognitoClient.confirmSignUp(confirmSignUpRequest);
+            LOG.info("confirmSignUpResult: ", confirmSignUpResponse.toString());
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+            return false;
+        }
+        return true;
     }
 
     public boolean login(String email, String password) {
