@@ -1,11 +1,14 @@
 package uk.gov.di.resources;
 
 import com.nimbusds.jwt.SignedJWT;
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
 
@@ -14,8 +17,11 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,16 +29,21 @@ import static org.mockito.Mockito.when;
 public class TokenResourceTest {
 
     private static final TokenService tokenService = mock(TokenService.class);
+    private static final AuthorizationCodeService authCodeService = mock(AuthorizationCodeService.class);
     private static final ClientService clientService = mock(ClientService.class);
     private static final SignedJWT signedJWT = mock(SignedJWT.class);
     private static final ResourceExtension tokenResourceExtension =
             ResourceExtension.builder()
-                    .addResource(new TokenResource(tokenService, clientService))
+                    .addResource(new TokenResource(tokenService, clientService, authCodeService))
                     .build();
 
     @Test
     public void testTokenResource() {
+        var email = "joe.bloggs@digital.cabinet-office.gov.uk";
+
         when(tokenService.generateIDToken(anyString())).thenReturn(signedJWT);
+        when(tokenService.issueToken(email)).thenReturn(new BearerAccessToken());
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(Optional.of(email));
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
@@ -47,6 +58,25 @@ public class TokenResourceTest {
                         .post(Entity.form(tokenResourceFormParams));
 
         assertEquals(HttpStatus.OK_200, response.getStatus());
+    }
+
+    @Test
+    public void shouldReturnForbiddenIfAuthorizationNotRecognised() {
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(Optional.empty());
+        when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
+
+        MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
+        tokenResourceFormParams.add("code", "123");
+        tokenResourceFormParams.add("client_id", "123");
+        tokenResourceFormParams.add("client_secret", "123");
+
+        final Response response =
+                tokenResourceExtension
+                        .target("/token")
+                        .request()
+                        .post(Entity.form(tokenResourceFormParams));
+
+        assertEquals(HttpStatus.FORBIDDEN_403, response.getStatus());
     }
 
     @Test

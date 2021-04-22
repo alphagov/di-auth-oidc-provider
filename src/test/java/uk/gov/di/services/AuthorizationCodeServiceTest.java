@@ -3,7 +3,7 @@ package uk.gov.di.services;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AuthorizationCodeServiceTest {
 
@@ -13,14 +13,14 @@ class AuthorizationCodeServiceTest {
     void shouldIssueAndStoreCodeForUser() {
         var code = authorizationCodeService.issueCodeForUser("user@example.com");
 
-        assertEquals("user@example.com", authorizationCodeService.getEmailForCode(code));
+        assertEquals("user@example.com", authorizationCodeService.getEmailForCode(code).get());
     }
 
     @Test
     void shouldOnlyAllowRetrievalOfCodeOnce() {
         var code = authorizationCodeService.issueCodeForUser("user@example.com");
 
-        assertEquals("user@example.com", authorizationCodeService.getEmailForCode(code));
-        assertNull(authorizationCodeService.getEmailForCode(code));
+        assertEquals("user@example.com", authorizationCodeService.getEmailForCode(code).get());
+        assertTrue(authorizationCodeService.getEmailForCode(code).isEmpty());
     }
 }

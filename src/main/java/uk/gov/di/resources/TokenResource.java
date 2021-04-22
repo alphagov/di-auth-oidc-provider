@@ -4,9 +4,10 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
-import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
+import org.apache.http.HttpStatus;
+import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
 
@@ -22,12 +23,14 @@ import javax.ws.rs.core.Response;
 @Path("/token")
 public class TokenResource {
 
-    private TokenService tokenService;
+    private final TokenService tokenService;
     private final ClientService clientService;
+    private final AuthorizationCodeService authorizationCodeService;
 
-    public TokenResource(TokenService tokenService, ClientService clientService) {
+    public TokenResource(TokenService tokenService, ClientService clientService, AuthorizationCodeService authorizationCodeService) {
         this.tokenService = tokenService;
         this.clientService = clientService;
+        this.authorizationCodeService = authorizationCodeService;
     }
 
     @POST
@@ -43,7 +46,13 @@ public class TokenResource {
             throw new RuntimeException("Bad authentication request");
         }
 
-        AccessToken accessToken = new BearerAccessToken();
+        var email = authorizationCodeService.getEmailForCode(code);
+
+        if (email.isEmpty()) {
+            return Response.status(HttpStatus.SC_FORBIDDEN).build();
+        }
+
+        AccessToken accessToken = tokenService.issueToken(email.get());
         SignedJWT idToken = tokenService.generateIDToken(clientId);
 
         OIDCTokens oidcTokens = new OIDCTokens(idToken, accessToken, null);
