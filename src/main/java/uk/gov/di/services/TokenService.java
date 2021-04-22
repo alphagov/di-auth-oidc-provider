@@ -13,17 +13,22 @@ import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.id.Audience;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.Subject;
+import com.nimbusds.oauth2.sdk.token.AccessToken;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TokenService {
 
     private OidcProviderConfiguration config;
+    private final Map<AccessToken, String> tokensMap = new HashMap<>();
 
     public TokenService(OidcProviderConfiguration config) {
         this.config = config;
@@ -61,6 +66,17 @@ public class TokenService {
         }
 
         return idToken;
+    }
+
+    public AccessToken issueToken(String email) {
+        AccessToken accessToken = new BearerAccessToken();
+        tokensMap.put(accessToken, email);
+
+        return accessToken;
+    }
+
+    public String getEmailForToken(AccessToken token) {
+        return tokensMap.get(token);
     }
 
     private RSAKey createSigningKey() {
