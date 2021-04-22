@@ -4,7 +4,9 @@ import io.dropwizard.views.View;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.CognitoService;
+import uk.gov.di.views.ConfirmRegistration;
 import uk.gov.di.services.UserService;
 import uk.gov.di.views.SetPasswordView;
 import uk.gov.di.views.SuccessfulRegistration;
@@ -27,19 +29,13 @@ import java.net.URI;
 @Path("/registration")
 public class RegistrationResource {
 
-    private UserService userService;
+    private AuthenticationService authenticationService;
 
-    public RegistrationResource(UserService userService) {
-        this.userService = userService;
+    public RegistrationResource(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationResource.class);
-
-    private CognitoService cognitoService;
-
-    public RegistrationResource(CognitoService cognitoService) {
-        this.cognitoService = cognitoService;
-    }
 
     @POST
     @Produces(MediaType.TEXT_HTML)
@@ -55,8 +51,7 @@ public class RegistrationResource {
                                 @FormParam("password") @NotNull String password,
                                 @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
-            userService.addUser(email, password);
-            cognitoService.signUp(email, password);
+            authenticationService.signUp(email, password);
             return Response.ok(new SuccessfulRegistration(authRequest))
                     .cookie(
                             new NewCookie(
@@ -95,17 +90,17 @@ public class RegistrationResource {
                 .build();
     }
 
-    @GET
+    @POST
     @Path("/verifyAccessCode")
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response verificationCode(
-            @QueryParam("username") String username,
-            @QueryParam("code") String code) {
+            @FormParam("email") String username,
+            @FormParam("code") String code) {
 
         LOG.info("/verifyAccessCode: {} {}", username, code);
 
-        if (cognitoService.VerifyAccessCode(username, code)) {
+        if (authenticationService.verifyAccessCode(username, code)) {
             return Response.ok(new VerificationResponseView(username)).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();

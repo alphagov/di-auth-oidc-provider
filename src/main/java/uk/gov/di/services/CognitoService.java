@@ -3,11 +3,13 @@ package uk.gov.di.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminGetUserRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ConfirmSignUpResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class CognitoService {
+public class CognitoService implements AuthenticationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CognitoService.class);
 
@@ -30,7 +32,21 @@ public class CognitoService {
         this.cognitoClient = cognitoClient;
     }
 
-    public SignUpResponse signUp(String email, String password) {
+    @Override
+    public boolean userExists(String email) {
+        try {
+
+            cognitoClient.adminGetUser(AdminGetUserRequest.builder()
+                    .userPoolId(userPoolId)
+                    .username(email).build());
+
+        } catch (CognitoIdentityProviderException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean signUp(String email, String password) {
         //https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html
 
         List<AttributeType> attributes = new ArrayList<>();
@@ -48,10 +64,10 @@ public class CognitoService {
 
         SignUpResponse signUpResponse = cognitoClient.signUp(request);
         LOG.info("signUpResponse: ", signUpResponse.toString());
-        return signUpResponse;
+        return signUpResponse.userConfirmed();
     }
 
-    public boolean VerifyAccessCode(String username, String code) {
+    public boolean verifyAccessCode(String username, String code) {
         ConfirmSignUpRequest confirmSignUpRequest =
                 ConfirmSignUpRequest.builder()
                         .clientId(clientId)

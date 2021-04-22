@@ -7,7 +7,7 @@ import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserService {
+public class UserService implements AuthenticationService {
 
     private final Map<String, String> credentialsMap = new HashMap<>(Map.of("joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     private final Map<String, UserInfo> userInfoMap = new HashMap<>();
@@ -23,6 +23,23 @@ public class UserService {
     }
 
 
+    @Override
+    public boolean signUp(String email, String password) {
+        credentialsMap.put(email, password);
+        return true;
+    }
+
+    @Override
+    public boolean verifyAccessCode(String username, String code) {
+        return true;
+    }
+
+    @Override
+    public boolean login(String email, String password) {
+        return credentialsMap.containsKey(email) && credentialsMap.get(email).equals(password);
+    }
+
+    @Override
     public boolean userExists(String email) {
         return credentialsMap.containsKey(email);
     }

@@ -31,11 +31,9 @@ public class LoginResourceTest {
     private static final UserService USER_SERVICE =
             mock(UserService.class);
 
-    private static final CognitoService cognitoService = mock(CognitoService.class);
-
     private static final ResourceExtension loginResource =
             ResourceExtension.builder()
-                    .addResource(new LoginResource(USER_SERVICE, cognitoService))
+                    .addResource(new LoginResource(USER_SERVICE))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
@@ -48,8 +46,8 @@ public class LoginResourceTest {
 
     @BeforeAll
     static void setUp() {
-        when(USER_SERVICE.isValidUser(anyString(), anyString())).thenReturn(false);
-        when(USER_SERVICE.isValidUser(
+        when(USER_SERVICE.login(anyString(), anyString())).thenReturn(false);
+        when(USER_SERVICE.login(
                 eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
                 .thenReturn(true);
         when(USER_SERVICE.userExists(anyString())).thenReturn(false);

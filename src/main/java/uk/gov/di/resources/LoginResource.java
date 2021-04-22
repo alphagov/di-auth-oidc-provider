@@ -1,6 +1,7 @@
 package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +27,10 @@ import java.net.URI;
 @Path("/login")
 public class LoginResource {
 
-    private UserService userService;
-    private CognitoService cognitoService;
+    private final AuthenticationService authenticationService;
 
-    private static final Logger LOG = LoggerFactory.getLogger(LoginResource.class);
-
-    public LoginResource(UserService userService, CognitoService cognitoService) {
-        this.userService = userService;
-        this.cognitoService = cognitoService;
+    public LoginResource(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @GET
@@ -46,7 +43,7 @@ public class LoginResource {
 
     @POST
     public Response login(@FormParam("authRequest") String authRequest, @FormParam("email") String email) {
-        if (userService.userExists(email)) {
+        if (authenticationService.userExists(email)) {
             return Response.ok(new PasswordView(authRequest, email)).build();
         }
         else {
@@ -66,9 +63,7 @@ public class LoginResource {
             @FormParam("authRequest") String authRequest,
             @FormParam("email") String email,
             @FormParam("password") String password) {
-        boolean isValid = userService.isValidUser(email, password);
-
-        boolean isValidCongito = cognitoService.login(email, password);
+        boolean isValid = authenticationService.login(email, password);
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest))

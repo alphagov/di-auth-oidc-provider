@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(DropwizardExtensionsSupport.class)
 class RegistrationResourceTest {
 
-    private static final CognitoService cognitoService = mock(CognitoService.class);
+    private static final CognitoService COGNITO_SERVICE = mock(CognitoService.class);
 
     private static final UserService USER_SERVICE = mock(UserService.class);
 
@@ -52,7 +52,7 @@ class RegistrationResourceTest {
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
         assertEquals("newuser@example.com", response.getCookies().get("userCookie").getValue());
-        verify(USER_SERVICE).addUser(eq("newuser@example.com"), eq("reallysecure1234"));
+        verify(USER_SERVICE).signUp(eq("newuser@example.com"), eq("reallysecure1234"));
     }
 
     @Test

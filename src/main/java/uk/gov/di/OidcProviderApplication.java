@@ -23,6 +23,7 @@ import uk.gov.di.resources.LogoutResource;
 import uk.gov.di.resources.RegistrationResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
@@ -30,6 +31,8 @@ import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
+
+import static uk.gov.di.configuration.OidcProviderConfiguration.AuthenticationServiceProvider.COGNITO;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
@@ -59,12 +62,6 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-        CognitoIdentityProviderClient cognitoIdentityClient = CognitoIdentityProviderClient.builder()
-                .region(Region.EU_WEST_2)
-                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
-                .build();
-
-        CognitoService cognitoService = new CognitoService(cognitoIdentityClient);
 
         PostgresService postgresService = new PostgresService(configuration);
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
@@ -74,15 +71,30 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var authorizationCodeService = new AuthorizationCodeService();
         var clientService =
                 new ClientService(clientConfigService.getClients(), authorizationCodeService);
+        var authenticationService = getAuthenticationService(configuration);
         var userService = new UserService();
         var tokenService = new TokenService(configuration);
 
         env.jersey().register(new AuthorisationResource(clientService));
-        env.jersey().register(new LoginResource(userService, cognitoService));
+        env.jersey().register(new LoginResource(authenticationService));
+        env.jersey().register(new RegistrationResource(authenticationService));
         env.jersey().register(new UserInfoResource(tokenService, userService));
         env.jersey().register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new RegistrationResource(userService));
         env.jersey().register(new LogoutResource());
         env.jersey().property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
+    }
+
+    private AuthenticationService getAuthenticationService(OidcProviderConfiguration configuration) {
+        LOG.info("getAuthenticationService={}", configuration.getAuthenticationServiceProvider());
+        if (configuration.getAuthenticationServiceProvider() == COGNITO) {
+            CognitoIdentityProviderClient cognitoIdentityClient = CognitoIdentityProviderClient.builder()
+                    .region(Region.EU_WEST_2)
+                    .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                    .build();
+            return new CognitoService(cognitoIdentityClient);
+        } else {
+            return new UserService();
+        }
     }
 }

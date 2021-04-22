@@ -9,11 +9,28 @@ import javax.validation.constraints.NotNull;
 
 public class OidcProviderConfiguration extends Configuration {
 
+    public enum AuthenticationServiceProvider {
+        COGNITO("cognito"),
+        USER("user");
+
+        private String providerName;
+
+        AuthenticationServiceProvider(String providerName) {
+            this.providerName = providerName;
+        }
+    }
+
     @JsonProperty @NotNull private String issuer;
+    @JsonProperty @NotNull private AuthenticationServiceProvider authenticationServiceProvider;
+
     @Valid private DataSourceFactory database;
 
     public String getIssuer() {
         return issuer;
+    }
+
+    public AuthenticationServiceProvider getAuthenticationServiceProvider() {
+        return authenticationServiceProvider;
     }
 
     @JsonProperty("database")
