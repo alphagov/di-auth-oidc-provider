@@ -2,6 +2,7 @@ package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
 import org.apache.http.HttpStatus;
+import uk.gov.di.services.UserService;
 import uk.gov.di.views.SetPasswordView;
 import uk.gov.di.views.SuccessfulRegistration;
 
@@ -20,6 +21,12 @@ import java.net.URI;
 @Path("/registration")
 public class RegistrationResource {
 
+    private UserService userService;
+
+    public RegistrationResource(UserService userService) {
+        this.userService = userService;
+    }
+
     @POST
     @Produces(MediaType.TEXT_HTML)
     public View setPassword(@FormParam("authRequest") String authRequest, @FormParam("email") @NotNull String email) {
@@ -34,6 +41,7 @@ public class RegistrationResource {
                                 @FormParam("password") @NotNull String password,
                                 @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
+            userService.addUser(email, password);
             return Response.ok(new SuccessfulRegistration(authRequest)).build();
         } else {
             return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new SetPasswordView(email, authRequest, true)).build();
