@@ -4,7 +4,6 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
-import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 import org.apache.http.HttpStatus;
@@ -49,12 +48,11 @@ public class TokenResource {
 
         var email = authorizationCodeService.getEmailForCode(code);
 
-        if (email == null) {
+        if (email.isEmpty()) {
             return Response.status(HttpStatus.SC_FORBIDDEN).build();
         }
 
-        AccessToken accessToken = tokenService.issueToken(email);
-
+        AccessToken accessToken = tokenService.issueToken(email.get());
         SignedJWT idToken = tokenService.generateIDToken(clientId);
 
         OIDCTokens oidcTokens = new OIDCTokens(idToken, accessToken, null);

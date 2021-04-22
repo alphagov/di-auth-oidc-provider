@@ -4,6 +4,7 @@ import com.nimbusds.oauth2.sdk.AuthorizationCode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class AuthorizationCodeService {
     private Map<AuthorizationCode, String> issuedCodes = new HashMap<>();
@@ -15,10 +16,10 @@ public class AuthorizationCodeService {
         return authorizationCode;
     }
 
-    public String getEmailForCode(AuthorizationCode authorizationCode) {
+    public Optional<String> getEmailForCode(AuthorizationCode authorizationCode) {
         String email = issuedCodes.get(authorizationCode);
         issuedCodes.remove(authorizationCode);
 
-        return email;
+        return Optional.ofNullable(email);
     }
 }

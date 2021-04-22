@@ -17,6 +17,8 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,7 +43,7 @@ public class TokenResourceTest {
 
         when(tokenService.generateIDToken(anyString())).thenReturn(signedJWT);
         when(tokenService.issueToken(email)).thenReturn(new BearerAccessToken());
-        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(email);
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(Optional.of(email));
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
@@ -60,7 +62,7 @@ public class TokenResourceTest {
 
     @Test
     public void shouldReturnForbiddenIfAuthorizationNotRecognised() {
-        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(null);
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(Optional.empty());
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
