@@ -1,6 +1,7 @@
 package uk.gov.di.resources;
 
 import com.codahale.metrics.MetricRegistry;
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.ClientID;
@@ -20,13 +21,14 @@ import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
-
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,19 +52,20 @@ public class AuthorisationResourceTest {
 
     @BeforeAll
     public static void setUp() {
-        when(clientService.validateAuthorizationRequest(any()))
-                .thenReturn(
-                        AuthenticationResponseHelper.generateSuccessfulAuthResponse(
-                                new AuthenticationRequest.Builder(
-                                                new ResponseType("code"),
-                                                new Scope("openid"),
-                                                new ClientID("test"),
-                                                URI.create("http://example.com/login-code"))
-                                        .build()));
+        when(clientService.getErrorForAuthorizationRequest(any()))
+                .thenReturn(Optional.empty());
     }
 
     @Test
     public void shouldProvideCodeAuthenticationRequestWhenLoggedIn() {
+        when(clientService.getSuccessfulResponse(any(), anyString())).thenReturn(
+                AuthenticationResponseHelper.generateSuccessfulAuthResponse(
+                        new AuthenticationRequest.Builder(
+                                new ResponseType("code"),
+                                new Scope("openid"),
+                                new ClientID("test"),
+                                URI.create("http://example.com/login-code"))
+                                .build(), new AuthorizationCode()));
         Response response = authorisationRequestBuilder().cookie("userCookie", "dummy-value").get();
 
         assertEquals(HttpStatus.FOUND_302, response.getStatus());
@@ -82,16 +85,8 @@ public class AuthorisationResourceTest {
 
     @Test
     public void shouldReturnErrorResponseWhenReceivingInvalidAuthRequest() {
-        when(clientService.validateAuthorizationRequest(any()))
-                .thenReturn(
-                        AuthenticationResponseHelper.generateErrorAuthnResponse(
-                                new AuthenticationRequest.Builder(
-                                                new ResponseType("code"),
-                                                new Scope("openid"),
-                                                new ClientID("test"),
-                                                URI.create("http://example.com/login-code"))
-                                        .build(),
-                                OIDCError.UNMET_AUTHENTICATION_REQUIREMENTS));
+        when(clientService.getErrorForAuthorizationRequest(any()))
+                .thenReturn(Optional.of(OIDCError.UNMET_AUTHENTICATION_REQUIREMENTS));
         Response response = authorisationRequestBuilder().get();
 
         assertEquals(HttpStatus.FOUND_302, response.getStatus());

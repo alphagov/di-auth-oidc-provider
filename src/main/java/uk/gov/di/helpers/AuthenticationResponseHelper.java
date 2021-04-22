@@ -10,10 +10,11 @@ import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
 public class AuthenticationResponseHelper {
 
     public static AuthenticationResponse generateSuccessfulAuthResponse(
-            AuthorizationRequest authRequest) {
+            AuthorizationRequest authRequest,
+            AuthorizationCode authorizationCode) {
         return new AuthenticationSuccessResponse(
                 authRequest.getRedirectionURI(),
-                new AuthorizationCode(),
+                authorizationCode,
                 null,
                 null,
                 authRequest.getState(),
