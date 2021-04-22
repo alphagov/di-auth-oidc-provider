@@ -1,21 +1,27 @@
 package uk.gov.di.services;
 
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
+import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
 import com.nimbusds.oauth2.sdk.ResponseMode;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
-import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.OIDCError;
 import org.junit.jupiter.api.Test;
 import uk.gov.di.entity.Client;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class ClientServiceTest {
+    private static final AuthorizationCodeService AUTHORIZATION_CODE_SERVICE = mock(AuthorizationCodeService.class);
     private static final ClientService CLIENT_SERVICE =
             new ClientService(
                     List.of(
@@ -24,12 +30,12 @@ class ClientServiceTest {
                                     "test-secret",
                                     List.of("email"),
                                     List.of("code"),
-                                    List.of("http://localhost:8080"))));
+                                    List.of("http://localhost:8080"))), AUTHORIZATION_CODE_SERVICE);
 
     @Test
     void validatesRegisteredClientSuccessfully() {
-        AuthenticationResponse authenticationResponse =
-                CLIENT_SERVICE.validateAuthorizationRequest(
+        Optional<ErrorObject> error =
+                CLIENT_SERVICE.getErrorForAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("code"),
@@ -39,13 +45,13 @@ class ClientServiceTest {
                                 new Scope("email"),
                                 new State()));
 
-        assertTrue(authenticationResponse.indicatesSuccess());
+        assertTrue(error.isEmpty());
     }
 
     @Test
     void authorizationRequestInvalidIfClientNotRegistered() {
-        AuthenticationResponse authenticationResponse =
-                CLIENT_SERVICE.validateAuthorizationRequest(
+        Optional<ErrorObject> error =
+                CLIENT_SERVICE.getErrorForAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("test"),
                                 new ResponseType(),
@@ -55,13 +61,13 @@ class ClientServiceTest {
                                 new Scope("openid"),
                                 new State()));
 
-        assertFalse(authenticationResponse.indicatesSuccess());
+        assertEquals(OIDCError.UNMET_AUTHENTICATION_REQUIREMENTS, error.get());
     }
 
     @Test
     void authorizationRequestInvalidIfClientRequestsForbiddenScope() {
-        AuthenticationResponse authenticationResponse =
-                CLIENT_SERVICE.validateAuthorizationRequest(
+        Optional<ErrorObject> error =
+                CLIENT_SERVICE.getErrorForAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("code"),
@@ -71,13 +77,13 @@ class ClientServiceTest {
                                 new Scope("phone"),
                                 new State()));
 
-        assertFalse(authenticationResponse.indicatesSuccess());
+        assertEquals(OAuth2Error.INVALID_SCOPE, error.get());
     }
 
     @Test
     void authorizationRequestInvalidIfClientRequestsForbiddenResponseType() {
-        AuthenticationResponse authenticationResponse =
-                CLIENT_SERVICE.validateAuthorizationRequest(
+        Optional<ErrorObject> error =
+                CLIENT_SERVICE.getErrorForAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("token"),
@@ -87,13 +93,13 @@ class ClientServiceTest {
                                 new Scope("email"),
                                 new State()));
 
-        assertFalse(authenticationResponse.indicatesSuccess());
+        assertEquals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE, error.get());
     }
 
     @Test
     void authorizationRequestInvalidIfClientRequestContainsInvalidRedirectUri() {
-        AuthenticationResponse authenticationResponse =
-                CLIENT_SERVICE.validateAuthorizationRequest(
+        Optional<ErrorObject> error =
+                CLIENT_SERVICE.getErrorForAuthorizationRequest(
                         new AuthorizationRequest(
                                 URI.create("http://localhost:8080"),
                                 new ResponseType("code"),
@@ -103,6 +109,6 @@ class ClientServiceTest {
                                 new Scope("email"),
                                 new State()));
 
-        assertFalse(authenticationResponse.indicatesSuccess());
+        assertEquals(OAuth2Error.INVALID_REQUEST_URI, error.get());
     }
 }

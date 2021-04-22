@@ -19,6 +19,7 @@ import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.RegistrationResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
+import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.PostgresService;
@@ -58,8 +59,9 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         jdbiFactory.installPlugin(new PostgresPlugin());
         jdbiFactory.installPlugin(new Jackson2Plugin());
         var clientConfigService = new ClientConfigService(jdbiFactory);
+        var authorizationCodeService = new AuthorizationCodeService();
         var clientService =
-                new ClientService(clientConfigService.getClients());
+                new ClientService(clientConfigService.getClients(), authorizationCodeService);
         var userService = new UserService();
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(userService));
