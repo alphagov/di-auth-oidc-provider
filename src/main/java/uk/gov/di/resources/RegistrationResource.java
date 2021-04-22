@@ -42,7 +42,18 @@ public class RegistrationResource {
                                 @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
             userService.addUser(email, password);
-            return Response.ok(new SuccessfulRegistration(authRequest)).build();
+            return Response.ok(new SuccessfulRegistration(authRequest))
+                    .cookie(
+                            new NewCookie(
+                                    "userCookie",
+                                    email,
+                                    "/",
+                                    null,
+                                    Cookie.DEFAULT_VERSION,
+                                    null,
+                                    NewCookie.DEFAULT_MAX_AGE,
+                                    false))
+                    .build();
         } else {
             return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new SetPasswordView(email, authRequest, true)).build();
         }
@@ -56,16 +67,6 @@ public class RegistrationResource {
             @FormParam("authRequest") String authRequest) {
         return Response.status(Response.Status.FOUND)
                 .location(URI.create("/authorize?" + authRequest))
-                .cookie(
-                        new NewCookie(
-                                "userCookie",
-                                "dummy",
-                                "/",
-                                null,
-                                Cookie.DEFAULT_VERSION,
-                                null,
-                                NewCookie.DEFAULT_MAX_AGE,
-                                false))
                 .build();
     }
 

@@ -63,7 +63,18 @@ public class LoginResource {
         boolean isValid = userService.isValidUser(email, password);
 
         if (isValid) {
-            return Response.ok(new SuccessfulLoginView(authRequest)).build();
+            return Response.ok(new SuccessfulLoginView(authRequest))
+                    .cookie(
+                            new NewCookie(
+                                    "userCookie",
+                                    email,
+                                    "/",
+                                    null,
+                                    Cookie.DEFAULT_VERSION,
+                                    null,
+                                    NewCookie.DEFAULT_MAX_AGE,
+                                    false))
+                    .build();
         } else {
             URI destination =
                     UriBuilder.fromUri(URI.create("/login"))
@@ -80,16 +91,6 @@ public class LoginResource {
     public Response continueToAuthorize(@FormParam("authRequest") String authRequest) {
         return Response.status(Response.Status.FOUND)
                 .location(URI.create("/authorize?" + authRequest))
-                .cookie(
-                        new NewCookie(
-                                "userCookie",
-                                "dummy",
-                                "/",
-                                null,
-                                Cookie.DEFAULT_VERSION,
-                                null,
-                                NewCookie.DEFAULT_MAX_AGE,
-                                false))
                 .build();
     }
 }
