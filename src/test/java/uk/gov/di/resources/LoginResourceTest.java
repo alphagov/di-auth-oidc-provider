@@ -59,6 +59,7 @@ public class LoginResourceTest {
                 loginRequest("joe.bloggs@digital.cabinet-office.gov.uk", "password");
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
+        assertEquals("joe.bloggs@digital.cabinet-office.gov.uk", response.getCookies().get("userCookie").getValue());
     }
 
     @Test

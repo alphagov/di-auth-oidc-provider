@@ -46,6 +46,7 @@ class RegistrationResourceTest {
         Response response = setPasswordRequest("newuser@example.com", "reallysecure1234", "reallysecure1234");
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
+        assertEquals("newuser@example.com", response.getCookies().get("userCookie").getValue());
         verify(USER_SERVICE).addUser(eq("newuser@example.com"), eq("reallysecure1234"));
     }
 
