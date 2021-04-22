@@ -1,7 +1,9 @@
 package uk.gov.di.services;
 
+import com.nimbusds.openid.connect.sdk.claims.Gender;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,5 +45,15 @@ public class UserServiceTest {
         userService.addUser("newuser@example.com", "1234");
 
         assertTrue(userService.isValidUser("newuser@example.com", "1234"));
+    }
+
+    @Test
+    public void shouldRetrieveUserInfoForEmail() {
+        var userInfo = userService.getInfoForEmail("joe.bloggs@digital.cabinet-office.gov.uk");
+
+        assertEquals(userInfo.getFamilyName(), "Bloggs");
+        assertEquals(userInfo.getGivenName(), "Joe");
+        assertEquals(userInfo.getEmailAddress(), "joe.bloggs@digital.cabinet-office.gov.uk");
+        assertEquals(userInfo.getGender(), Gender.MALE);
     }
 }

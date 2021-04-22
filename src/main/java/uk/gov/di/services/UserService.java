@@ -12,7 +12,6 @@ public class UserService {
     private final Map<String, String> credentialsMap = new HashMap<>(Map.of("joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     private final Map<String, UserInfo> userInfoMap = new HashMap<>();
 
-
     public UserService() {
         UserInfo userInfo = new UserInfo(new Subject());
         userInfo.setFamilyName("Bloggs");
@@ -39,5 +38,9 @@ public class UserService {
         userInfo.setEmailAddress(email);
 
         userInfoMap.put(email, userInfo);
+    }
+
+    public UserInfo getInfoForEmail(String email) {
+        return userInfoMap.get(email);
     }
 }
