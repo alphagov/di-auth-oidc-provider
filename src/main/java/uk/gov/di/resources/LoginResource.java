@@ -3,8 +3,7 @@ package uk.gov.di.resources;
 import io.dropwizard.views.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
-import uk.gov.di.services.CognitoService;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.UserValidationService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
@@ -28,11 +27,11 @@ import java.net.URI;
 public class LoginResource {
 
     private UserValidationService userValidationService;
-    private CognitoService cognitoService;
+    private AuthenticationService cognitoService;
 
     private static final Logger LOG = LoggerFactory.getLogger(LoginResource.class);
 
-    public LoginResource(UserValidationService userValidationService, CognitoService cognitoService) {
+    public LoginResource(UserValidationService userValidationService, AuthenticationService cognitoService) {
         this.userValidationService = userValidationService;
         this.cognitoService = cognitoService;
     }

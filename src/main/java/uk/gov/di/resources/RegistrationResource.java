@@ -86,7 +86,7 @@ public class RegistrationResource {
 
         LOG.info("/verifyAccessCode: {} {}", username, code);
 
-        if (cognitoService.VerifyAccessCode(username, code)) {
+        if (cognitoService.verifyAccessCode(username, code)) {
             return Response.ok(new VerificationResponseView(username)).build();
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
