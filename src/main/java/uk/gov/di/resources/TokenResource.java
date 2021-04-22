@@ -7,6 +7,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
+import org.apache.http.HttpStatus;
 import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
@@ -47,6 +48,11 @@ public class TokenResource {
         }
 
         var email = authorizationCodeService.getEmailForCode(code);
+
+        if (email == null) {
+            return Response.status(HttpStatus.SC_FORBIDDEN).build();
+        }
+
         AccessToken accessToken = tokenService.issueToken(email);
 
         SignedJWT idToken = tokenService.generateIDToken(clientId);

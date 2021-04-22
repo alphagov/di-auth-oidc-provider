@@ -59,6 +59,25 @@ public class TokenResourceTest {
     }
 
     @Test
+    public void shouldReturnForbiddenIfAuthorizationNotRecognised() {
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(null);
+        when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
+
+        MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
+        tokenResourceFormParams.add("code", "123");
+        tokenResourceFormParams.add("client_id", "123");
+        tokenResourceFormParams.add("client_secret", "123");
+
+        final Response response =
+                tokenResourceExtension
+                        .target("/token")
+                        .request()
+                        .post(Entity.form(tokenResourceFormParams));
+
+        assertEquals(HttpStatus.FORBIDDEN_403, response.getStatus());
+    }
+
+    @Test
     public void shouldValidateClientCredentials() {
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(false);
 
