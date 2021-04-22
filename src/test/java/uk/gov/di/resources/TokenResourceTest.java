@@ -1,6 +1,8 @@
 package uk.gov.di.resources;
 
 import com.nimbusds.jwt.SignedJWT;
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
 import org.eclipse.jetty.http.HttpStatus;
@@ -17,6 +19,7 @@ import javax.ws.rs.core.Response;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +37,11 @@ public class TokenResourceTest {
 
     @Test
     public void testTokenResource() {
+        var email = "joe.bloggs@digital.cabinet-office.gov.uk";
+
         when(tokenService.generateIDToken(anyString())).thenReturn(signedJWT);
+        when(tokenService.issueToken(email)).thenReturn(new BearerAccessToken());
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(email);
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();

@@ -46,7 +46,9 @@ public class TokenResource {
             throw new RuntimeException("Bad authentication request");
         }
 
-        AccessToken accessToken = new BearerAccessToken();
+        var email = authorizationCodeService.getEmailForCode(code);
+        AccessToken accessToken = tokenService.issueToken(email);
+
         SignedJWT idToken = tokenService.generateIDToken(clientId);
 
         OIDCTokens oidcTokens = new OIDCTokens(idToken, accessToken, null);
