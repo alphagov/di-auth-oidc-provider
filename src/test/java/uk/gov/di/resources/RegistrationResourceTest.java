@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.services.CognitoService;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -16,14 +17,17 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class RegistrationResourceTest {
 
+    private static final CognitoService cognitoService = mock(CognitoService.class);
+
     private static final ResourceExtension REGISTRATION_RESOURCE =
             ResourceExtension.builder()
-                    .addResource(new RegistrationResource())
+                    .addResource(new RegistrationResource(cognitoService))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
