@@ -2,7 +2,7 @@ package uk.gov.di.services;
 
 import java.util.Map;
 
-public class UserValidationService {
+public class UserService {
 
     private final Map<String, String> credentialsMap = Map.of("joe.bloggs@digital.cabinet-office.gov.uk", "password");
 

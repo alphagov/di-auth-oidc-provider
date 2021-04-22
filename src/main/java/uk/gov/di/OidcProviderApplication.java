@@ -14,7 +14,6 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
-import uk.gov.di.entity.Client;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.RegistrationResource;
@@ -24,9 +23,7 @@ import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.TokenService;
-import uk.gov.di.services.UserValidationService;
-
-import java.util.List;
+import uk.gov.di.services.UserService;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
@@ -64,7 +61,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var clientService =
                 new ClientService(clientConfigService.getClients());
         env.jersey().register(new AuthorisationResource(clientService));
-        env.jersey().register(new LoginResource(new UserValidationService()));
+        env.jersey().register(new LoginResource(new UserService()));
         env.jersey().register(new UserInfoResource());
         env.jersey().register(new TokenResource(new TokenService(configuration), clientService));
         env.jersey().register(new RegistrationResource());

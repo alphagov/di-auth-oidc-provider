@@ -10,7 +10,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.di.services.UserValidationService;
+import uk.gov.di.services.UserService;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -27,12 +27,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class LoginResourceTest {
 
-    private static final UserValidationService userValidationService =
-            mock(UserValidationService.class);
+    private static final UserService USER_SERVICE =
+            mock(UserService.class);
 
     private static final ResourceExtension loginResource =
             ResourceExtension.builder()
-                    .addResource(new LoginResource(userValidationService))
+                    .addResource(new LoginResource(USER_SERVICE))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
@@ -45,12 +45,12 @@ public class LoginResourceTest {
 
     @BeforeAll
     static void setUp() {
-        when(userValidationService.isValidUser(anyString(), anyString())).thenReturn(false);
-        when(userValidationService.isValidUser(
+        when(USER_SERVICE.isValidUser(anyString(), anyString())).thenReturn(false);
+        when(USER_SERVICE.isValidUser(
                 eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
                 .thenReturn(true);
-        when(userValidationService.userExists(anyString())).thenReturn(false);
-        when(userValidationService.userExists(eq("joe.bloggs@digital.cabinet-office.gov.uk"))).thenReturn(true);
+        when(USER_SERVICE.userExists(anyString())).thenReturn(false);
+        when(USER_SERVICE.userExists(eq("joe.bloggs@digital.cabinet-office.gov.uk"))).thenReturn(true);
     }
 
     @Test

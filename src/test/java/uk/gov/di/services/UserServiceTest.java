@@ -5,36 +5,36 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserValidationServiceTest {
+public class UserServiceTest {
 
-    private final UserValidationService userValidationService = new UserValidationService();
+    private final UserService userService = new UserService();
 
     @Test
     public void shouldValidateUserWithCorrectCredentials() {
         assertTrue(
-                userValidationService.isValidUser(
+                userService.isValidUser(
                         "joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     }
 
     @Test
     public void shouldValidateUserWithUnknownUsername() {
-        assertFalse(userValidationService.isValidUser("unknown@nowhere", "password"));
+        assertFalse(userService.isValidUser("unknown@nowhere", "password"));
     }
 
     @Test
     public void shouldValidateUserWithWrongPassword() {
         assertFalse(
-                userValidationService.isValidUser(
+                userService.isValidUser(
                         "joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
     }
 
     @Test
     public void shouldValidateThatUserExists() {
-        assertTrue(userValidationService.userExists("joe.bloggs@digital.cabinet-office.gov.uk"));
+        assertTrue(userService.userExists("joe.bloggs@digital.cabinet-office.gov.uk"));
     }
 
     @Test
     public void shouldValidateThatUserDoesNotExists() {
-        assertFalse(userValidationService.userExists("unknown@nowhere"));
+        assertFalse(userService.userExists("unknown@nowhere"));
     }
 }
