@@ -62,8 +62,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
     @Override
     public void run(OidcProviderConfiguration configuration, Environment env) {
-
-        PostgresService postgresService = new PostgresService(configuration);
+        PostgresService.setPostgresCredentialsFromVcap(configuration);
         var jdbiFactory = new JdbiFactory().build(env, configuration.getDatabase(), "postgresql");
         jdbiFactory.installPlugin(new PostgresPlugin());
         jdbiFactory.installPlugin(new Jackson2Plugin());
