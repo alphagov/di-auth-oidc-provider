@@ -87,6 +87,12 @@ mainClassName = 'uk.gov.di.OidcProviderApplication'
 
 run {
     args = ['server', 'oidc-provider.yml']
+    debugOptions {
+        enabled = true
+        port = 8082
+        server = true
+        suspend = false
+    }
 }
 
 task cfPush(type: Exec) {
