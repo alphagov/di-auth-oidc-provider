@@ -9,7 +9,7 @@ import org.apache.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.UserService;
 
 import javax.ws.rs.client.Entity;
@@ -25,6 +25,8 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class RegistrationResourceTest {
+
+    private static final CognitoService COGNITO_SERVICE = mock(CognitoService.class);
 
     private static final UserService USER_SERVICE = mock(UserService.class);
 
@@ -47,7 +49,7 @@ class RegistrationResourceTest {
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
         assertEquals("newuser@example.com", response.getCookies().get("userCookie").getValue());
-        verify(USER_SERVICE).addUser(eq("newuser@example.com"), eq("reallysecure1234"));
+        verify(USER_SERVICE).signUp(eq("newuser@example.com"), eq("reallysecure1234"));
     }
 
     @Test

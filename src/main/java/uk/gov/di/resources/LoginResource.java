@@ -1,7 +1,7 @@
 package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
-import uk.gov.di.services.UserService;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;
@@ -18,16 +18,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
 import java.net.URI;
 
 @Path("/login")
 public class LoginResource {
 
-    private UserService userService;
+    private final AuthenticationService authenticationService;
 
-    public LoginResource(UserService userService) {
-        this.userService = userService;
+    public LoginResource(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @GET
@@ -40,7 +39,7 @@ public class LoginResource {
 
     @POST
     public Response login(@FormParam("authRequest") String authRequest, @FormParam("email") String email) {
-        if (userService.userExists(email)) {
+        if (authenticationService.userExists(email)) {
             return Response.ok(new PasswordView(authRequest, email)).build();
         }
         else {
@@ -60,7 +59,7 @@ public class LoginResource {
             @FormParam("authRequest") String authRequest,
             @FormParam("email") String email,
             @FormParam("password") String password) {
-        boolean isValid = userService.isValidUser(email, password);
+        boolean isValid = authenticationService.login(email, password);
 
         if (isValid) {
             return Response.ok(new SuccessfulLoginView(authRequest))

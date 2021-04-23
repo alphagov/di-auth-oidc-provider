@@ -2,9 +2,13 @@ package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
 import org.apache.http.HttpStatus;
-import uk.gov.di.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.gov.di.services.AuthenticationService;
+import uk.gov.di.views.ConfirmRegistration;
 import uk.gov.di.views.SetPasswordView;
 import uk.gov.di.views.SuccessfulRegistration;
+import uk.gov.di.views.VerificationResponseView;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -21,11 +25,13 @@ import java.net.URI;
 @Path("/registration")
 public class RegistrationResource {
 
-    private UserService userService;
+    private AuthenticationService authenticationService;
 
-    public RegistrationResource(UserService userService) {
-        this.userService = userService;
+    public RegistrationResource(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
+
+    private static final Logger LOG = LoggerFactory.getLogger(RegistrationResource.class);
 
     @POST
     @Produces(MediaType.TEXT_HTML)
@@ -41,19 +47,23 @@ public class RegistrationResource {
                                 @FormParam("password") @NotNull String password,
                                 @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
-            userService.addUser(email, password);
-            return Response.ok(new SuccessfulRegistration(authRequest))
-                    .cookie(
-                            new NewCookie(
-                                    "userCookie",
-                                    email,
-                                    "/",
-                                    null,
-                                    Cookie.DEFAULT_VERSION,
-                                    null,
-                                    NewCookie.DEFAULT_MAX_AGE,
-                                    false))
-                    .build();
+            authenticationService.signUp(email, password);
+            if (authenticationService.isEmailVerificationRequired()) {
+                return Response.ok(new ConfirmRegistration(authRequest, email)).build();
+            } else {
+                return Response.ok(new SuccessfulRegistration(authRequest))
+                        .cookie(
+                                new NewCookie(
+                                        "userCookie",
+                                        email,
+                                        "/",
+                                        null,
+                                        Cookie.DEFAULT_VERSION,
+                                        null,
+                                        NewCookie.DEFAULT_MAX_AGE,
+                                        false))
+                        .build();
+            }
         } else {
             return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new SetPasswordView(email, authRequest, true)).build();
         }
@@ -70,4 +80,20 @@ public class RegistrationResource {
                 .build();
     }
 
+    @POST
+    @Path("/verifyAccessCode")
+    @Produces(MediaType.TEXT_HTML)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response verificationCode(
+            @FormParam("email") String username,
+            @FormParam("code") String code) {
+
+        LOG.info("/verifyAccessCode: {} {}", username, code);
+
+        if (authenticationService.verifyAccessCode(username, code)) {
+            return Response.ok(new VerificationResponseView(username)).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
 }

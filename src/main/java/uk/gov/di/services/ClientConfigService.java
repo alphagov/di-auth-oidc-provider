@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.generic.GenericType;
 import uk.gov.di.entity.Client;
 
 import java.util.List;

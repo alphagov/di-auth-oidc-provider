@@ -3,8 +3,10 @@ package uk.gov.di.resources;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.TokenService;
-import uk.gov.di.services.UserService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -16,12 +18,14 @@ import javax.ws.rs.core.Response;
 @Path("/userinfo")
 public class UserInfoResource {
 
-    private final TokenService tokenService;
-    private final UserService userService;
+    private static final Logger LOG = LoggerFactory.getLogger(UserInfoResource.class);
 
-    public UserInfoResource(TokenService tokenService, UserService userService) {
+    private final TokenService tokenService;
+    private final AuthenticationService authenticationService;
+
+    public UserInfoResource(TokenService tokenService, AuthenticationService authenticationService) {
         this.tokenService = tokenService;
-        this.userService = userService;
+        this.authenticationService = authenticationService;
     }
 
     @GET
@@ -32,7 +36,8 @@ public class UserInfoResource {
             AccessToken accessToken = AccessToken.parse(authorizationHeader);
 
             var email = tokenService.getEmailForToken(accessToken);
-            var userInfo = userService.getInfoForEmail(email);
+            LOG.info("UserInfoResource.userinfo: {} {}", email, accessToken.toJSONString());
+            var userInfo = authenticationService.getInfoForEmail(email);
 
             return Response.ok(userInfo.toJSONObject()).build();
         } catch (ParseException e) {

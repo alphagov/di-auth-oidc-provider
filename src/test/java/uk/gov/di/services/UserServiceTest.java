@@ -14,19 +14,19 @@ public class UserServiceTest {
     @Test
     public void shouldValidateUserWithCorrectCredentials() {
         assertTrue(
-                userService.isValidUser(
+                userService.login(
                         "joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     }
 
     @Test
     public void shouldValidateUserWithUnknownUsername() {
-        assertFalse(userService.isValidUser("unknown@nowhere", "password"));
+        assertFalse(userService.login("unknown@nowhere", "password"));
     }
 
     @Test
     public void shouldValidateUserWithWrongPassword() {
         assertFalse(
-                userService.isValidUser(
+                userService.login(
                         "joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
     }
 
@@ -42,9 +42,8 @@ public class UserServiceTest {
 
     @Test
     public void shouldValidateANewUser() {
-        userService.addUser("newuser@example.com", "1234");
-
-        assertTrue(userService.isValidUser("newuser@example.com", "1234"));
+        userService.signUp("newuser@example.com", "1234");
+        assertTrue(userService.login("newuser@example.com", "1234"));
     }
 
     @Test

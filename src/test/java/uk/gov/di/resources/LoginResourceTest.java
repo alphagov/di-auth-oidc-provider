@@ -45,8 +45,8 @@ public class LoginResourceTest {
 
     @BeforeAll
     static void setUp() {
-        when(USER_SERVICE.isValidUser(anyString(), anyString())).thenReturn(false);
-        when(USER_SERVICE.isValidUser(
+        when(USER_SERVICE.login(anyString(), anyString())).thenReturn(false);
+        when(USER_SERVICE.login(
                 eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
                 .thenReturn(true);
         when(USER_SERVICE.userExists(anyString())).thenReturn(false);
