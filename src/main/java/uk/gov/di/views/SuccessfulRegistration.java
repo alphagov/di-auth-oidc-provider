@@ -7,7 +7,7 @@ public class SuccessfulRegistration extends View {
     private String authRequest;
 
     public SuccessfulRegistration(String authRequest) {
-     super("successful-registration.mustache");
+        super("successful-registration.mustache");
         this.authRequest = authRequest;
     }
 

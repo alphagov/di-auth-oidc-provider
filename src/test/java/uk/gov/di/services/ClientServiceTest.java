@@ -21,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class ClientServiceTest {
-    private static final AuthorizationCodeService AUTHORIZATION_CODE_SERVICE = mock(AuthorizationCodeService.class);
+    private static final AuthorizationCodeService AUTHORIZATION_CODE_SERVICE =
+            mock(AuthorizationCodeService.class);
     private static final ClientService CLIENT_SERVICE =
             new ClientService(
                     List.of(
@@ -30,7 +31,8 @@ class ClientServiceTest {
                                     "test-secret",
                                     List.of("email"),
                                     List.of("code"),
-                                    List.of("http://localhost:8080"))), AUTHORIZATION_CODE_SERVICE);
+                                    List.of("http://localhost:8080"))),
+                    AUTHORIZATION_CODE_SERVICE);
 
     @Test
     void validatesRegisteredClientSuccessfully() {

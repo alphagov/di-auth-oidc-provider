@@ -16,6 +16,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,7 +46,8 @@ class RegistrationResourceTest {
 
     @Test
     void shouldSucceedIfPasswordsMatch() {
-        Response response = setPasswordRequest("newuser@example.com", "reallysecure1234", "reallysecure1234");
+        Response response =
+                setPasswordRequest("newuser@example.com", "reallysecure1234", "reallysecure1234");
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
         assertEquals("newuser@example.com", response.getCookies().get("userCookie").getValue());

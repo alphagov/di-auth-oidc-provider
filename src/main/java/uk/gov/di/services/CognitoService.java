@@ -49,9 +49,8 @@ public class CognitoService implements AuthenticationService {
     public boolean userExists(String email) {
         try {
 
-            cognitoClient.adminGetUser(AdminGetUserRequest.builder()
-                    .userPoolId(userPoolId)
-                    .username(email).build());
+            cognitoClient.adminGetUser(
+                    AdminGetUserRequest.builder().userPoolId(userPoolId).username(email).build());
 
         } catch (CognitoIdentityProviderException e) {
             return false;
@@ -62,17 +61,15 @@ public class CognitoService implements AuthenticationService {
     @Override
     public boolean signUp(String email, String password) {
         List<AttributeType> attributes = new ArrayList<>();
-        attributes.add(AttributeType.builder()
-                .name("email")
-                .value(email)
-                .build());
+        attributes.add(AttributeType.builder().name("email").value(email).build());
 
-        SignUpRequest request = SignUpRequest.builder()
-                .clientId(clientId)
-                .username(email)
-                .password(password)
-                .userAttributes(attributes)
-                .build();
+        SignUpRequest request =
+                SignUpRequest.builder()
+                        .clientId(clientId)
+                        .username(email)
+                        .password(password)
+                        .userAttributes(attributes)
+                        .build();
 
         SignUpResponse signUpResponse = cognitoClient.signUp(request);
         LOG.info("signUpResponse: ", signUpResponse.toString());
@@ -89,7 +86,8 @@ public class CognitoService implements AuthenticationService {
                         .build();
 
         try {
-            ConfirmSignUpResponse confirmSignUpResponse = cognitoClient.confirmSignUp(confirmSignUpRequest);
+            ConfirmSignUpResponse confirmSignUpResponse =
+                    cognitoClient.confirmSignUp(confirmSignUpRequest);
             LOG.info("confirmSignUpResult: ", confirmSignUpResponse.toString());
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -104,12 +102,13 @@ public class CognitoService implements AuthenticationService {
         authParams.put("USERNAME", email);
         authParams.put("PASSWORD", password);
 
-        AdminInitiateAuthRequest authRequest = AdminInitiateAuthRequest.builder()
-                .authFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
-                .userPoolId(userPoolId)
-                .clientId(clientId)
-                .authParameters(authParams)
-                .build();
+        AdminInitiateAuthRequest authRequest =
+                AdminInitiateAuthRequest.builder()
+                        .authFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
+                        .userPoolId(userPoolId)
+                        .clientId(clientId)
+                        .authParameters(authParams)
+                        .build();
         try {
             AdminInitiateAuthResponse authResult = cognitoClient.adminInitiateAuth(authRequest);
             AuthenticationResultType authenticationResult = authResult.authenticationResult();

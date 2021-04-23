@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+
 import java.net.URI;
 
 @Path("/login")
@@ -38,16 +39,16 @@ public class LoginResource {
     }
 
     @POST
-    public Response login(@FormParam("authRequest") String authRequest, @FormParam("email") String email) {
+    public Response login(
+            @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
         if (authenticationService.userExists(email)) {
             return Response.ok(new PasswordView(authRequest, email)).build();
-        }
-        else {
-            URI destination =
-                    UriBuilder.fromUri(URI.create("/registration"))
-                            .build();
+        } else {
+            URI destination = UriBuilder.fromUri(URI.create("/registration")).build();
 
-            return Response.status(Response.Status.TEMPORARY_REDIRECT).location(destination).build();
+            return Response.status(Response.Status.TEMPORARY_REDIRECT)
+                    .location(destination)
+                    .build();
         }
     }
 

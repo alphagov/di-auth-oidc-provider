@@ -24,7 +24,9 @@ class UserInfoResourceTest {
     private static final TokenService tokenService = mock(TokenService.class);
     private static final UserService userService = mock(UserService.class);
     private static final ResourceExtension userInfoExtension =
-            ResourceExtension.builder().addResource(new UserInfoResource(tokenService, userService)).build();
+            ResourceExtension.builder()
+                    .addResource(new UserInfoResource(tokenService, userService))
+                    .build();
 
     @Test
     void shouldReturnUnauthorisedIfNoHeaderPresent() {

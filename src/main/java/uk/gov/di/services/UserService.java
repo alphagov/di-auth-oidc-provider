@@ -13,7 +13,8 @@ public class UserService implements AuthenticationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
-    private final Map<String, String> credentialsMap = new HashMap<>(Map.of("joe.bloggs@digital.cabinet-office.gov.uk", "password"));
+    private final Map<String, String> credentialsMap =
+            new HashMap<>(Map.of("joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     private final Map<String, UserInfo> userInfoMap = new HashMap<>();
 
     public UserService() {

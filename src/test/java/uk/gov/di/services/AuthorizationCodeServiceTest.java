@@ -7,7 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AuthorizationCodeServiceTest {
 
-    private static AuthorizationCodeService authorizationCodeService = new AuthorizationCodeService();
+    private static AuthorizationCodeService authorizationCodeService =
+            new AuthorizationCodeService();
 
     @Test
     void shouldIssueAndStoreCodeForUser() {

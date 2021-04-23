@@ -20,6 +20,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+
 import java.net.URI;
 
 @Path("/registration")
@@ -35,17 +36,20 @@ public class RegistrationResource {
 
     @POST
     @Produces(MediaType.TEXT_HTML)
-    public View setPassword(@FormParam("authRequest") String authRequest, @FormParam("email") @NotNull String email) {
+    public View setPassword(
+            @FormParam("authRequest") String authRequest,
+            @FormParam("email") @NotNull String email) {
         return new SetPasswordView(email, authRequest);
     }
 
     @POST
     @Produces(MediaType.TEXT_HTML)
     @Path("/validate")
-    public Response setPassword(@FormParam("authRequest") String authRequest,
-                                @FormParam("email") @NotNull String email,
-                                @FormParam("password") @NotNull String password,
-                                @FormParam("password-confirm") @NotNull String passwordConfirm) {
+    public Response setPassword(
+            @FormParam("authRequest") String authRequest,
+            @FormParam("email") @NotNull String email,
+            @FormParam("password") @NotNull String password,
+            @FormParam("password-confirm") @NotNull String passwordConfirm) {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
             authenticationService.signUp(email, password);
             if (authenticationService.isEmailVerificationRequired()) {
@@ -65,7 +69,9 @@ public class RegistrationResource {
                         .build();
             }
         } else {
-            return Response.status(HttpStatus.SC_BAD_REQUEST).entity(new SetPasswordView(email, authRequest, true)).build();
+            return Response.status(HttpStatus.SC_BAD_REQUEST)
+                    .entity(new SetPasswordView(email, authRequest, true))
+                    .build();
         }
     }
 
@@ -73,8 +79,7 @@ public class RegistrationResource {
     @Path("/continue")
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response validateLogin(
-            @FormParam("authRequest") String authRequest) {
+    public Response validateLogin(@FormParam("authRequest") String authRequest) {
         return Response.status(Response.Status.FOUND)
                 .location(URI.create("/authorize?" + authRequest))
                 .build();
@@ -85,8 +90,7 @@ public class RegistrationResource {
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response verificationCode(
-            @FormParam("email") String username,
-            @FormParam("code") String code) {
+            @FormParam("email") String username, @FormParam("code") String code) {
 
         LOG.info("/verifyAccessCode: {} {}", username, code);
 

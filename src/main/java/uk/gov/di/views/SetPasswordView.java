@@ -8,7 +8,7 @@ public class SetPasswordView extends View {
     private String authRequest;
     private boolean invalidPassword;
 
-    public SetPasswordView (String email, String authRequest) {
+    public SetPasswordView(String email, String authRequest) {
         this(email, authRequest, false);
     }
 

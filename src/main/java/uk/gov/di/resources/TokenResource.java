@@ -27,7 +27,10 @@ public class TokenResource {
     private final ClientService clientService;
     private final AuthorizationCodeService authorizationCodeService;
 
-    public TokenResource(TokenService tokenService, ClientService clientService, AuthorizationCodeService authorizationCodeService) {
+    public TokenResource(
+            TokenService tokenService,
+            ClientService clientService,
+            AuthorizationCodeService authorizationCodeService) {
         this.tokenService = tokenService;
         this.clientService = clientService;
         this.authorizationCodeService = authorizationCodeService;

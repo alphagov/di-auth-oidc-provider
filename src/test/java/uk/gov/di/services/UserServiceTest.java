@@ -13,9 +13,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldValidateUserWithCorrectCredentials() {
-        assertTrue(
-                userService.login(
-                        "joe.bloggs@digital.cabinet-office.gov.uk", "password"));
+        assertTrue(userService.login("joe.bloggs@digital.cabinet-office.gov.uk", "password"));
     }
 
     @Test
@@ -25,9 +23,7 @@ public class UserServiceTest {
 
     @Test
     public void shouldValidateUserWithWrongPassword() {
-        assertFalse(
-                userService.login(
-                        "joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
+        assertFalse(userService.login("joe.bloggs@digital.cabinet-office.gov.uk", "badPassword"));
     }
 
     @Test

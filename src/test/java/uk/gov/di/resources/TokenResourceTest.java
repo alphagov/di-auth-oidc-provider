@@ -29,7 +29,8 @@ import static org.mockito.Mockito.when;
 public class TokenResourceTest {
 
     private static final TokenService tokenService = mock(TokenService.class);
-    private static final AuthorizationCodeService authCodeService = mock(AuthorizationCodeService.class);
+    private static final AuthorizationCodeService authCodeService =
+            mock(AuthorizationCodeService.class);
     private static final ClientService clientService = mock(ClientService.class);
     private static final SignedJWT signedJWT = mock(SignedJWT.class);
     private static final ResourceExtension tokenResourceExtension =
@@ -43,7 +44,8 @@ public class TokenResourceTest {
 
         when(tokenService.generateIDToken(anyString())).thenReturn(signedJWT);
         when(tokenService.issueToken(email)).thenReturn(new BearerAccessToken());
-        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(Optional.of(email));
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123"))))
+                .thenReturn(Optional.of(email));
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();
@@ -62,7 +64,8 @@ public class TokenResourceTest {
 
     @Test
     public void shouldReturnForbiddenIfAuthorizationNotRecognised() {
-        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123")))).thenReturn(Optional.empty());
+        when(authCodeService.getEmailForCode(eq(new AuthorizationCode("123"))))
+                .thenReturn(Optional.empty());
         when(clientService.isValidClient(anyString(), anyString())).thenReturn(true);
 
         MultivaluedMap<String, String> tokenResourceFormParams = new MultivaluedHashMap<>();

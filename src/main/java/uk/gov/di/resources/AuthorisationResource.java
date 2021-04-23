@@ -42,15 +42,17 @@ public class AuthorisationResource {
         Optional<ErrorObject> error = clientService.getErrorForAuthorizationRequest(authRequest);
 
         if (error.isPresent()) {
-            AuthenticationResponse response = AuthenticationResponseHelper.generateErrorAuthnResponse(
-                    authRequest, error.get());
+            AuthenticationResponse response =
+                    AuthenticationResponseHelper.generateErrorAuthnResponse(
+                            authRequest, error.get());
             return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
                     .location(response.toErrorResponse().toURI())
                     .build();
         }
 
         if (loggedIn) {
-            AuthenticationResponse response = clientService.getSuccessfulResponse(authRequest, email.get());
+            AuthenticationResponse response =
+                    clientService.getSuccessfulResponse(authRequest, email.get());
             return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
                     .location(response.toSuccessResponse().toURI())
                     .build();

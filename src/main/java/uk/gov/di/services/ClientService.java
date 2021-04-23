@@ -47,7 +47,8 @@ public class ClientService {
         return Optional.empty();
     }
 
-    public AuthenticationResponse getSuccessfulResponse(AuthenticationRequest authRequest, String email) {
+    public AuthenticationResponse getSuccessfulResponse(
+            AuthenticationRequest authRequest, String email) {
         AuthorizationCode code = authorizationCodeService.issueCodeForUser(email);
         return AuthenticationResponseHelper.generateSuccessfulAuthResponse(authRequest, code);
     }

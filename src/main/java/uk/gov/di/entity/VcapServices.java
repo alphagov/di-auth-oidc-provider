@@ -21,16 +21,17 @@ public class VcapServices {
     public record Service(Credentials credentials) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Credentials(String host, String port, String name, String username, String password) {}
+    public record Credentials(
+            String host, String port, String name, String username, String password) {}
 
     public static Optional<Credentials> readPostgresConfiguration(String vcapServices) {
         try {
-            var services = new ObjectMapper()
-                .configure(FAIL_ON_MISSING_CREATOR_PROPERTIES, true)
-                .readValue(
-                    vcapServices,
-                    new TypeReference<Map<String, List<Service>>>() {}
-                );
+            var services =
+                    new ObjectMapper()
+                            .configure(FAIL_ON_MISSING_CREATOR_PROPERTIES, true)
+                            .readValue(
+                                    vcapServices,
+                                    new TypeReference<Map<String, List<Service>>>() {});
 
             if (services == null || !services.containsKey("postgres")) {
                 LOG.info("Unable to find 'postgres' key in VCAP_SERVICES");
