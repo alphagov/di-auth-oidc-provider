@@ -1,5 +1,6 @@
 plugins {
     id "com.avast.gradle.docker-compose" version "0.14.3"
+    id "com.diffplug.spotless" version "5.12.4"
 }
 
 apply plugin: 'java'
@@ -25,6 +26,14 @@ dockerCompose {
 }
 
 group 'uk.gov.di'
+
+spotless {
+    java {
+        target '**/*.java'
+        googleJavaFormat('1.10.0').aosp()
+        importOrder '', 'javax', 'java', '\\#'
+    }
+}
 
 repositories {
     mavenCentral()
@@ -71,7 +80,7 @@ dependencies {
     }
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}",
-        "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}",
+            "io.dropwizard:dropwizard-testing:${dependencyVersions.dropwizard}",
             "org.mockito:mockito-core:${dependencyVersions.mockito_version}",
             "org.mockito:mockito-junit-jupiter:${dependencyVersions.mockito_version}"
 
