@@ -2,10 +2,6 @@ package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
 import uk.gov.di.services.AuthenticationService;
-import uk.gov.di.services.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.gov.di.services.CognitoService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;

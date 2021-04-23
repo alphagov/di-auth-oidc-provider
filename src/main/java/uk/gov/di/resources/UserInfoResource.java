@@ -6,9 +6,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.services.AuthenticationService;
-import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.TokenService;
-import uk.gov.di.services.UserService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;

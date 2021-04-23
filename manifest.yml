@@ -10,3 +10,4 @@ applications:
     env:
       JAVA_HOME: "../.java-buildpack/open_jdk_jre"
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 16.+}}'
+      AUTHENTICATION_SERVICE_PROVIDER: user

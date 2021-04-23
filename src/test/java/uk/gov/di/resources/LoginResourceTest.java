@@ -10,7 +10,6 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.UserService;
 
 import javax.ws.rs.client.Entity;

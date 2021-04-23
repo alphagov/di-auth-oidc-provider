@@ -26,7 +26,6 @@ public class CognitoService implements AuthenticationService {
     private static final Logger LOG = LoggerFactory.getLogger(CognitoService.class);
 
     private CognitoIdentityProviderClient cognitoClient;
-    //ClientId of the userpool in Cognito
     private final String clientId = "3pf8i39bspmlkmd9pqo1s626oe";
     private final String userPoolId = "eu-west-2_JVIkRJSaV";
 
@@ -62,8 +61,6 @@ public class CognitoService implements AuthenticationService {
 
     @Override
     public boolean signUp(String email, String password) {
-        //https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html
-
         List<AttributeType> attributes = new ArrayList<>();
         attributes.add(AttributeType.builder()
                 .name("email")
@@ -113,19 +110,15 @@ public class CognitoService implements AuthenticationService {
                 .clientId(clientId)
                 .authParameters(authParams)
                 .build();
-
         try {
             AdminInitiateAuthResponse authResult = cognitoClient.adminInitiateAuth(authRequest);
             AuthenticationResultType authenticationResult = authResult.authenticationResult();
-
-            LOG.info("authResult: " + authResult.toString());
+            LOG.info("authResult: " + authResult);
             LOG.info("authenticationResult: " + authenticationResult.toString());
-
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
             return false;
         }
-
         return true;
     }
 }
