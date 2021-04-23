@@ -6,7 +6,7 @@ server:
     port: 8080
 
 issuer: di-auth-oidc-provider
-authenticationServiceProvider: ${AUTHENTICATION_SERVICE_PROVIDER:-cognito}
+authenticationServiceProvider: ${AUTHENTICATION_SERVICE_PROVIDER:-user}
 
 database:
   driverClass: org.postgresql.Driver

@@ -1,5 +1,7 @@
 package uk.gov.di.services;
 
+import com.nimbusds.oauth2.sdk.id.Subject;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -33,6 +35,18 @@ public class CognitoService implements AuthenticationService {
     }
 
     @Override
+    public UserInfo getInfoForEmail(String email) {
+        UserInfo userInfo = new UserInfo(new Subject());
+        userInfo.setEmailAddress(email);
+        return userInfo;
+    }
+
+    @Override
+    public boolean isEmailVerificationRequired() {
+        return true;
+    }
+
+    @Override
     public boolean userExists(String email) {
         try {
 
@@ -46,6 +60,7 @@ public class CognitoService implements AuthenticationService {
         return true;
     }
 
+    @Override
     public boolean signUp(String email, String password) {
         //https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_SignUp.html
 
@@ -67,6 +82,7 @@ public class CognitoService implements AuthenticationService {
         return signUpResponse.userConfirmed();
     }
 
+    @Override
     public boolean verifyAccessCode(String username, String code) {
         ConfirmSignUpRequest confirmSignUpRequest =
                 ConfirmSignUpRequest.builder()
@@ -85,6 +101,7 @@ public class CognitoService implements AuthenticationService {
         return true;
     }
 
+    @Override
     public boolean login(String email, String password) {
         LinkedHashMap<String, String> authParams = new LinkedHashMap<>();
         authParams.put("USERNAME", email);
