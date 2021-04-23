@@ -8,7 +8,7 @@ public class ConfirmRegistration extends View {
     private String email;
 
     public ConfirmRegistration(String authRequest, String email) {
-     super("confirm-registration.mustache");
+        super("confirm-registration.mustache");
         this.authRequest = authRequest;
         this.email = email;
     }

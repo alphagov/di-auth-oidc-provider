@@ -77,19 +77,23 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey().register(new LoginResource(authenticationService));
         env.jersey().register(new RegistrationResource(authenticationService));
         env.jersey().register(new UserInfoResource(tokenService, authenticationService));
-        env.jersey().register(new TokenResource(tokenService, clientService, authorizationCodeService));
+        env.jersey()
+                .register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new LogoutResource());
         env.jersey().register(new RegistrationResource(authenticationService));
-        env.jersey().property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
+        env.jersey()
+                .property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
     }
 
-    private AuthenticationService getAuthenticationService(OidcProviderConfiguration configuration) {
+    private AuthenticationService getAuthenticationService(
+            OidcProviderConfiguration configuration) {
         LOG.info("getAuthenticationService={}", configuration.getAuthenticationServiceProvider());
         if (configuration.getAuthenticationServiceProvider() == COGNITO) {
-            CognitoIdentityProviderClient cognitoIdentityClient = CognitoIdentityProviderClient.builder()
-                    .region(Region.EU_WEST_2)
-                    .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
-                    .build();
+            CognitoIdentityProviderClient cognitoIdentityClient =
+                    CognitoIdentityProviderClient.builder()
+                            .region(Region.EU_WEST_2)
+                            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                            .build();
             return new CognitoService(cognitoIdentityClient);
         } else {
             return new UserService();

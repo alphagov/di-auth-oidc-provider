@@ -21,6 +21,7 @@ import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.Optional;
@@ -52,20 +53,21 @@ public class AuthorisationResourceTest {
 
     @BeforeAll
     public static void setUp() {
-        when(clientService.getErrorForAuthorizationRequest(any()))
-                .thenReturn(Optional.empty());
+        when(clientService.getErrorForAuthorizationRequest(any())).thenReturn(Optional.empty());
     }
 
     @Test
     public void shouldProvideCodeAuthenticationRequestWhenLoggedIn() {
-        when(clientService.getSuccessfulResponse(any(), anyString())).thenReturn(
-                AuthenticationResponseHelper.generateSuccessfulAuthResponse(
-                        new AuthenticationRequest.Builder(
-                                new ResponseType("code"),
-                                new Scope("openid"),
-                                new ClientID("test"),
-                                URI.create("http://example.com/login-code"))
-                                .build(), new AuthorizationCode()));
+        when(clientService.getSuccessfulResponse(any(), anyString()))
+                .thenReturn(
+                        AuthenticationResponseHelper.generateSuccessfulAuthResponse(
+                                new AuthenticationRequest.Builder(
+                                                new ResponseType("code"),
+                                                new Scope("openid"),
+                                                new ClientID("test"),
+                                                URI.create("http://example.com/login-code"))
+                                        .build(),
+                                new AuthorizationCode()));
         Response response = authorisationRequestBuilder().cookie("userCookie", "dummy-value").get();
 
         assertEquals(HttpStatus.FOUND_302, response.getStatus());

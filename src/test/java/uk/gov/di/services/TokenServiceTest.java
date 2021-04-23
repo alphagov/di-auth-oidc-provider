@@ -16,5 +16,4 @@ public class TokenServiceTest {
 
         assertEquals("test@digital.cabinet-office.gov.uk", tokenService.getEmailForToken(token));
     }
-
 }

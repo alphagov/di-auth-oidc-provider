@@ -13,8 +13,10 @@ public class PostgresService {
 
             var credentials = VcapServices.readPostgresConfiguration(vcap).orElseThrow();
 
-            String uri = format("jdbc:postgresql://{0}:{1}/{2}",
-                    credentials.host(), credentials.port(), credentials.name());
+            String uri =
+                    format(
+                            "jdbc:postgresql://{0}:{1}/{2}",
+                            credentials.host(), credentials.port(), credentials.name());
 
             config.getDatabase().setUrl(uri);
             config.getDatabase().setUser(credentials.username());

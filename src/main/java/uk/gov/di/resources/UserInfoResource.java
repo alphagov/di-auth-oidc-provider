@@ -23,7 +23,8 @@ public class UserInfoResource {
     private final TokenService tokenService;
     private final AuthenticationService authenticationService;
 
-    public UserInfoResource(TokenService tokenService, AuthenticationService authenticationService) {
+    public UserInfoResource(
+            TokenService tokenService, AuthenticationService authenticationService) {
         this.tokenService = tokenService;
         this.authenticationService = authenticationService;
     }

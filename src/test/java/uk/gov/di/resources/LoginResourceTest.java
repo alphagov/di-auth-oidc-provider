@@ -16,6 +16,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,8 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class LoginResourceTest {
 
-    private static final UserService USER_SERVICE =
-            mock(UserService.class);
+    private static final UserService USER_SERVICE = mock(UserService.class);
 
     private static final ResourceExtension loginResource =
             ResourceExtension.builder()
@@ -46,11 +46,11 @@ public class LoginResourceTest {
     @BeforeAll
     static void setUp() {
         when(USER_SERVICE.login(anyString(), anyString())).thenReturn(false);
-        when(USER_SERVICE.login(
-                eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
+        when(USER_SERVICE.login(eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
                 .thenReturn(true);
         when(USER_SERVICE.userExists(anyString())).thenReturn(false);
-        when(USER_SERVICE.userExists(eq("joe.bloggs@digital.cabinet-office.gov.uk"))).thenReturn(true);
+        when(USER_SERVICE.userExists(eq("joe.bloggs@digital.cabinet-office.gov.uk")))
+                .thenReturn(true);
     }
 
     @Test
@@ -59,7 +59,9 @@ public class LoginResourceTest {
                 loginRequest("joe.bloggs@digital.cabinet-office.gov.uk", "password");
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
-        assertEquals("joe.bloggs@digital.cabinet-office.gov.uk", response.getCookies().get("userCookie").getValue());
+        assertEquals(
+                "joe.bloggs@digital.cabinet-office.gov.uk",
+                response.getCookies().get("userCookie").getValue());
     }
 
     @Test
@@ -78,10 +80,8 @@ public class LoginResourceTest {
         loginResourceFormParams.add("email", "joe.bloggs@digital.cabinet-office.gov.uk");
         loginResourceFormParams.add("submit", "sign-in");
 
-        final Response response = loginResource
-                .target("/login")
-                .request()
-                .post(Entity.form(loginResourceFormParams));
+        final Response response =
+                loginResource.target("/login").request().post(Entity.form(loginResourceFormParams));
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
     }
@@ -92,10 +92,8 @@ public class LoginResourceTest {
         loginResourceFormParams.add("authRequest", "whatever");
         loginResourceFormParams.add("email", "notexists@digital.cabinet-office.gov.uk");
 
-        final Response response = loginResource
-                .target("/login")
-                .request()
-                .post(Entity.form(loginResourceFormParams));
+        final Response response =
+                loginResource.target("/login").request().post(Entity.form(loginResourceFormParams));
 
         assertEquals(HttpStatus.SC_TEMPORARY_REDIRECT, response.getStatus());
         assertEquals("/registration", response.getLocation().getPath());

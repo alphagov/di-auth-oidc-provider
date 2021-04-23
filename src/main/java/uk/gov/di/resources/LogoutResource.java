@@ -8,6 +8,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+
 import java.net.URI;
 
 @Path("/logout")
@@ -15,12 +16,9 @@ public class LogoutResource {
 
     @GET
     public Response logout(@QueryParam("redirectUri") @NotNull String redirectUri) {
-        URI destination =
-                UriBuilder.fromUri(URI.create(redirectUri))
-                        .build();
+        URI destination = UriBuilder.fromUri(URI.create(redirectUri)).build();
 
-        return Response
-                .status(302)
+        return Response.status(302)
                 .location(destination)
                 .cookie(
                         new NewCookie(

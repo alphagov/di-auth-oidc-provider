@@ -9,7 +9,8 @@ class VcapServicesTest {
     @Test
     void shouldReadVcap() {
 
-        var input = """
+        var input =
+                """
         {
             "postgres": [
                 {
@@ -51,7 +52,8 @@ class VcapServicesTest {
 
     @Test
     void ignoresIrrelevantFields() {
-        var input = """
+        var input =
+                """
         {
             "some-other-field": [],
             "postgres": [{
@@ -73,7 +75,8 @@ class VcapServicesTest {
 
     @Test
     void requiresAllFieldsToBePresent() {
-        var input = """
+        var input =
+                """
         {
             "postgres": [{
                 "credentials": {

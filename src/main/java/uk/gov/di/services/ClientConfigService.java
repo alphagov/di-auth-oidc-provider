@@ -17,25 +17,35 @@ public class ClientConfigService {
     }
 
     public List<Client> getClients() {
-        return database.withHandle(handle ->
-                handle
-                        .createQuery("SELECT * FROM client;")
-                        .map((rs, ctx) -> {
-                            ObjectMapper mapper = new ObjectMapper();
+        return database.withHandle(
+                handle ->
+                        handle.createQuery("SELECT * FROM client;")
+                                .map(
+                                        (rs, ctx) -> {
+                                            ObjectMapper mapper = new ObjectMapper();
 
-                            try {
-                                return new Client(
-                                        rs.getString("client_id"),
-                                        rs.getString("client_secret"),
-                                        mapper.readValue(rs.getString("scopes"), new TypeReference<List<String>>() {}),
-                                        mapper.readValue(rs.getString("allowed_response_types"), new TypeReference<List<String>>() {}),
-                                        mapper.readValue(rs.getString("redirect_urls"), new TypeReference<List<String>>() {})
-                                );
-                            } catch (JsonProcessingException e) {
-                                e.printStackTrace();
-                                return null;
-                            }
-                        })
-                        .list());
+                                            try {
+                                                return new Client(
+                                                        rs.getString("client_id"),
+                                                        rs.getString("client_secret"),
+                                                        mapper.readValue(
+                                                                rs.getString("scopes"),
+                                                                new TypeReference<
+                                                                        List<String>>() {}),
+                                                        mapper.readValue(
+                                                                rs.getString(
+                                                                        "allowed_response_types"),
+                                                                new TypeReference<
+                                                                        List<String>>() {}),
+                                                        mapper.readValue(
+                                                                rs.getString("redirect_urls"),
+                                                                new TypeReference<
+                                                                        List<String>>() {}));
+                                            } catch (JsonProcessingException e) {
+                                                e.printStackTrace();
+                                                return null;
+                                            }
+                                        })
+                                .list());
     }
 }
