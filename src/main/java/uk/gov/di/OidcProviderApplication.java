@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.LoginResource;
+import uk.gov.di.resources.LogoutResource;
 import uk.gov.di.resources.RegistrationResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
@@ -70,6 +71,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey().register(new UserInfoResource(tokenService, userService));
         env.jersey().register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new RegistrationResource(userService));
+        env.jersey().register(new LogoutResource());
         env.jersey().property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
     }
 }
