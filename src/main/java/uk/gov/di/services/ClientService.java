@@ -55,7 +55,8 @@ public class ClientService {
 
     public boolean isValidClient(String clientId, String clientSecret) {
         Optional<Client> client = getClient(clientId);
-        return client.isPresent() && client.get().clientSecret().equals(clientSecret);
+        return client.map(c -> c.clientSecret().equals(clientSecret))
+                .orElse(false);
     }
 
     private Optional<Client> getClient(String clientId) {

@@ -3,7 +3,6 @@ package uk.gov.di.resources;
 import com.nimbusds.oauth2.sdk.ErrorObject;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
-import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import uk.gov.di.helpers.AuthenticationResponseHelper;
 import uk.gov.di.services.ClientService;
@@ -35,34 +34,23 @@ public class AuthorisationResource {
     public Response authorize(
             @Context UriInfo uriInfo, @CookieParam("userCookie") Optional<String> email)
             throws ParseException, RuntimeException {
-        boolean loggedIn = email.isPresent();
-
         var authRequest = AuthenticationRequest.parse(uriInfo.getRequestUri());
 
         Optional<ErrorObject> error = clientService.getErrorForAuthorizationRequest(authRequest);
 
-        if (error.isPresent()) {
-            AuthenticationResponse response =
-                    AuthenticationResponseHelper.generateErrorAuthnResponse(
-                            authRequest, error.get());
-            return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
-                    .location(response.toErrorResponse().toURI())
-                    .build();
-        }
+        return error
+                .map(e -> Response.status(HttpStatus.MOVED_TEMPORARILY_302).location(AuthenticationResponseHelper.generateErrorAuthnResponse(authRequest, e).toURI()).build())
+                .orElse(checkIfUserIsLoggedIn(email, authRequest));
+    }
 
-        if (loggedIn) {
-            AuthenticationResponse response =
-                    clientService.getSuccessfulResponse(authRequest, email.get());
-            return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
-                    .location(response.toSuccessResponse().toURI())
-                    .build();
-        } else {
-            return Response.status(HttpStatus.MOVED_TEMPORARILY_302)
-                    .location(
-                            UriBuilder.fromUri(URI.create("/login"))
-                                    .queryParam("authRequest", authRequest.toQueryString())
-                                    .build())
-                    .build();
-        }
+    private Response checkIfUserIsLoggedIn(Optional<String> email, AuthenticationRequest authRequest) {
+        return email.map(e -> Response.status(HttpStatus.MOVED_TEMPORARILY_302)
+                .location(clientService.getSuccessfulResponse(authRequest, e)
+                        .toSuccessResponse()
+                        .toURI()).build())
+                .orElse(Response.status(HttpStatus.MOVED_TEMPORARILY_302)
+                        .location(UriBuilder.fromUri(URI.create("/login"))
+                                .queryParam("authRequest", authRequest.toQueryString())
+                                .build()).build());
     }
 }
