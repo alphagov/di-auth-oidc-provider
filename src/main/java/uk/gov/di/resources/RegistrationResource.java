@@ -5,9 +5,9 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.services.AuthenticationService;
-import uk.gov.di.views.ConfirmRegistration;
+import uk.gov.di.views.ConfirmRegistrationView;
 import uk.gov.di.views.SetPasswordView;
-import uk.gov.di.views.SuccessfulRegistration;
+import uk.gov.di.views.SuccessfulRegistrationView;
 import uk.gov.di.views.VerificationResponseView;
 
 import javax.validation.constraints.NotNull;
@@ -53,9 +53,9 @@ public class RegistrationResource {
         if (!password.isBlank() && password.equals(passwordConfirm)) {
             authenticationService.signUp(email, password);
             if (authenticationService.isEmailVerificationRequired()) {
-                return Response.ok(new ConfirmRegistration(authRequest, email)).build();
+                return Response.ok(new ConfirmRegistrationView(authRequest, email)).build();
             } else {
-                return Response.ok(new SuccessfulRegistration(authRequest))
+                return Response.ok(new SuccessfulRegistrationView(authRequest))
                         .cookie(
                                 new NewCookie(
                                         "userCookie",
