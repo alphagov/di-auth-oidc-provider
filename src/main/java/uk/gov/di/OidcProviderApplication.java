@@ -92,8 +92,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
                             .region(Region.EU_WEST_2)
                             .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                             .build());
-                    case SRP -> new SRPUserService();
-                    default -> new UserService();
+                    default -> new SRPUserService();
                 };
     }
 }

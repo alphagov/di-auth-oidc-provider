@@ -1,5 +1,6 @@
 package uk.gov.di.services;
 
+import com.nimbusds.oauth2.sdk.id.Subject;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.srp6.SRP6ClientCredentials;
 import com.nimbusds.srp6.SRP6ClientSession;
@@ -54,7 +55,7 @@ public class SRPUserService implements AuthenticationService{
                 BigInteger M2 = serverStep2(srp6ServerSession, credentials.A, credentials.M1);
                 return clientStep3(srp6ClientSession, M2);
             } catch (SRP6Exception e) {
-
+                return false;
             }
         }
         return false;
@@ -67,7 +68,9 @@ public class SRPUserService implements AuthenticationService{
 
     @Override
     public UserInfo getInfoForEmail(String email) {
-        return null;
+        UserInfo userInfo = new UserInfo(new Subject());
+        userInfo.setEmailAddress(email);
+        return userInfo;
     }
 
     private SRPStep1Response serverStep1(SRP6ServerSession srp6ServerSession, String email) {
@@ -82,7 +85,6 @@ public class SRPUserService implements AuthenticationService{
     private SRP6ClientCredentials clientStep2(SRP6ClientSession srp6ClientSession, SRPStep1Response srpStep1Response) throws SRP6Exception {
 
         SRP6CryptoParams config = SRP6CryptoParams.getInstance();
-        SRP6ClientCredentials cred = null;
 
         return srp6ClientSession.step2(config, new BigInteger(srpStep1Response.salt(), 16), new BigInteger(srpStep1Response.B(),16));
     }
