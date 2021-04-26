@@ -1,7 +1,10 @@
 package uk.gov.di.services;
 
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
+import com.nimbusds.srp6.SRP6ClientCredentials;
+import com.nimbusds.srp6.SRP6ClientSession;
 import com.nimbusds.srp6.SRP6CryptoParams;
+import com.nimbusds.srp6.SRP6Exception;
 import com.nimbusds.srp6.SRP6ServerSession;
 import com.nimbusds.srp6.SRP6VerifierGenerator;
 import uk.gov.di.entity.SRP6Credentials;
@@ -43,6 +46,8 @@ public class SRPUserService implements AuthenticationService{
 
     @Override
     public boolean login(String email, String password) {
+        SRPStep1Response srpStep1Response = step1(email);
+        var M2 = step2(srpStep1Response);
         return false;
     }
 
@@ -56,7 +61,7 @@ public class SRPUserService implements AuthenticationService{
         return null;
     }
 
-    public SRPStep1Response step1(String email) {
+    private SRPStep1Response step1(String email) {
         var credentials = credentialsMap.get(email);
         BigInteger salt = new BigInteger(credentials.salt(), 16);
         BigInteger verifier = new BigInteger(credentials.verifier(), 16);
@@ -64,4 +69,31 @@ public class SRPUserService implements AuthenticationService{
         BigInteger b = srp6ServerSession.step1(email, salt, verifier);
         return new SRPStep1Response(credentials.salt(), b.toString(16));
     }
+
+    private BigInteger step2(SRPStep1Response srpStep1Response) {
+
+        SRP6CryptoParams config = SRP6CryptoParams.getInstance();
+        SRP6ClientCredentials cred = null;
+
+        SRP6ClientSession srp6ClientSession = new SRP6ClientSession();
+
+        try {
+            cred = srp6ClientSession.step2(config, new BigInteger(srpStep1Response.salt(), 16), new BigInteger(srpStep1Response.B(),16));
+
+        } catch (SRP6Exception e) {
+            // Invalid server 'B'
+        }
+
+       return serverStep2(cred.A, cred.M1);
+    }
+
+    private BigInteger serverStep2(final BigInteger A, final BigInteger M1) {
+        try {
+            return srp6ServerSession.step2(A, M1);
+        } catch (SRP6Exception e) {
+            // User authentication failed
+            throw new RuntimeException(e);
+        }
+    }
+
 }
