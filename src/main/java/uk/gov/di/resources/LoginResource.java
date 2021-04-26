@@ -93,10 +93,4 @@ public class LoginResource {
                 .location(URI.create("/authorize?" + authRequest))
                 .build();
     }
-
-//    @POST
-//    @Path("/srpstep1")
-//    public Response srpStep1(@FormParam("email") String email) {
-//        return Response.ok(authenticationService.step1(email)).build();
-//    }
 }
