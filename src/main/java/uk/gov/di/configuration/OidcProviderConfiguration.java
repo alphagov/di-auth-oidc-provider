@@ -11,7 +11,8 @@ public class OidcProviderConfiguration extends Configuration {
 
     public enum AuthenticationServiceProvider {
         COGNITO("cognito"),
-        USER("user");
+        USER("user"),
+        SRP("srp");
 
         private String providerName;
 
