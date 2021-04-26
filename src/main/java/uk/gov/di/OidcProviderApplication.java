@@ -29,6 +29,7 @@ import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.PostgresService;
+import uk.gov.di.services.SRPUserService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
 
@@ -70,7 +71,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var authorizationCodeService = new AuthorizationCodeService();
         var clientService =
                 new ClientService(clientConfigService.getClients(), authorizationCodeService);
-        var authenticationService = getAuthenticationService(configuration);
+        var authenticationService = new SRPUserService();
         var tokenService = new TokenService(configuration);
 
         env.jersey().register(new AuthorisationResource(clientService));
