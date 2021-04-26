@@ -16,6 +16,10 @@ while [[ $# -gt 0 ]]; do
     export AUTHENTICATION_SERVICE_PROVIDER=srp
     USE_COGNITO=0
     ;;
+  --cognitosrp)
+    export AUTHENTICATION_SERVICE_PROVIDER=cognitosrp
+    USE_COGNITO=1
+    ;;
   esac
   shift
 done
