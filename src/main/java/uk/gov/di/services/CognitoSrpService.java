@@ -4,6 +4,9 @@ import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.nimbusds.srp6.SRP6ClientCredentials;
 import com.nimbusds.srp6.SRP6ClientSession;
 import com.nimbusds.srp6.SRP6CryptoParams;
+import com.nimbusds.srp6.SRP6Routines;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
@@ -23,8 +26,16 @@ import java.util.Map;
 
 public class CognitoSrpService extends CognitoService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CognitoSrpService.class);
+
     public CognitoSrpService(CognitoIdentityProviderClient cognitoClient) {
         super(cognitoClient);
+    }
+
+    @Override
+    public boolean login(String email, String password) {
+        performSRPAuthentication(email, password);
+        return true;
     }
 
     @Override
@@ -35,40 +46,50 @@ public class CognitoSrpService extends CognitoService {
     public String performSRPAuthentication(String username, String password) {
         String authresult = null;
 
-        InitiateAuthRequest initiateAuthRequest = initiateUserSrpAuthRequest(username);
+        InitiateAuthRequest initiateAuthRequest = initiateUserSrpAuthRequest(username, password);
+
         try {
             InitiateAuthResponse initiateAuthResponse = cognitoClient.initiateAuth(initiateAuthRequest);
-            if (ChallengeNameType.PASSWORD_VERIFIER.toString().equals(initiateAuthResponse.challengeName())) {
-                RespondToAuthChallengeRequest challengeRequest = userSrpAuthRequest(initiateAuthResult, password,
-                        initiateAuthRequest.authParameters().get("SECRET_HASH"));
-                RespondToAuthChallengeResult result = cognitoIdentityProvider.respondToAuthChallenge(challengeRequest);
-                //System.out.println(result);
-                System.out.println(CognitoJWTParser.getPayload(result.getAuthenticationResult().getIdToken()));
-                authresult = result.getAuthenticationResult().getIdToken();
-            }
+            LOG.info("performSRPAuthentication:initiateAuthResponse: {}", initiateAuthResponse.toString());
+
         } catch (final Exception ex) {
             System.out.println("Exception" + ex);
 
         }
+
+//            if (ChallengeNameType.PASSWORD_VERIFIER.toString().equals(initiateAuthResponse.challengeName())) {
+//                RespondToAuthChallengeRequest challengeRequest = userSrpAuthRequest(initiateAuthResult, password,
+//                        initiateAuthRequest.authParameters().get("SECRET_HASH"));
+//                RespondToAuthChallengeResult result = cognitoIdentityProvider.respondToAuthChallenge(challengeRequest);
+//                //System.out.println(result);
+//                System.out.println(CognitoJWTParser.getPayload(result.getAuthenticationResult().getIdToken()));
+//                authresult = result.getAuthenticationResult().getIdToken();
+//            }
+//        } catch (final Exception ex) {
+//            System.out.println("Exception" + ex);
+//
+//        }
         return authresult;
     }
 
     private InitiateAuthRequest initiateUserSrpAuthRequest(String username, String password) {
+
         SRP6CryptoParams config = SRP6CryptoParams.getInstance();
-        SRP6ClientSession srp6ClientSession = new SRP6ClientSession();
-        srp6ClientSession.step1(username, password);
-        SRP6ClientCredentials cred = srp6ClientSession.step2(config, new BigInteger(srpStep1Response.salt(), 16), new BigInteger(srpStep1Response.B(),16));
+        SRP6Routines srp6Routines = new SRP6Routines();
+        // Generate client private and public values
+        var a = srp6Routines.generatePrivateValue(config.N, new SecureRandom());
+        config.getMessageDigestInstance().reset();
+
+        var A = srp6Routines.computePublicClientValue(config.N, config.g, a);
         Map<String, String> authParams = new HashMap<>();
         authParams.put("USERNAME", username);
-        authParams.put("SRP_A", );
+        authParams.put("SRP_A", A.toString(16));
 
-        InitiateAuthRequest initiateAuthRequest = InitiateAuthRequest.builder()
+        return InitiateAuthRequest.builder()
                 .authFlow(AuthFlowType.USER_SRP_AUTH)
                 .clientId(this.clientId)
                 .authParameters(authParams)
                 .build();
-
-        return initiateAuthRequest;
     }
 
     private String calculateSecretHash(String userPoolClientId, String userPoolClientSecret, String userName) {
