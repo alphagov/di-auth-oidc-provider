@@ -2,7 +2,6 @@ package uk.gov.di.resources;
 
 import io.dropwizard.views.View;
 import uk.gov.di.services.AuthenticationService;
-import uk.gov.di.services.SRPUserService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;
@@ -24,9 +23,9 @@ import java.net.URI;
 @Path("/login")
 public class LoginResource {
 
-    private final SRPUserService authenticationService;
+    private final AuthenticationService authenticationService;
 
-    public LoginResource(SRPUserService authenticationService) {
+    public LoginResource(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
@@ -94,9 +93,9 @@ public class LoginResource {
                 .build();
     }
 
-    @POST
-    @Path("/srpstep1")
-    public Response srpStep1(@FormParam("email") String email) {
-        return Response.ok(authenticationService.step1(email)).build();
-    }
+//    @POST
+//    @Path("/srpstep1")
+//    public Response srpStep1(@FormParam("email") String email) {
+//        return Response.ok(authenticationService.step1(email)).build();
+//    }
 }

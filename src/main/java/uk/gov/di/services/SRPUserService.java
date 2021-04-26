@@ -3,7 +3,7 @@ package uk.gov.di.services;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.srp6.SRP6CryptoParams;
 import com.nimbusds.srp6.SRP6ServerSession;
-import org.apache.commons.codec.binary.Hex;
+import com.nimbusds.srp6.SRP6VerifierGenerator;
 import uk.gov.di.entity.SRP6Credentials;
 import uk.gov.di.entity.SRPStep1Response;
 
@@ -28,7 +28,12 @@ public class SRPUserService implements AuthenticationService{
 
     @Override
     public boolean signUp(String email, String password) {
-        return false;
+        SRP6CryptoParams config = SRP6CryptoParams.getInstance();
+        SRP6VerifierGenerator gen = new SRP6VerifierGenerator(config);
+        BigInteger salt = new BigInteger(gen.generateRandomSalt());
+        BigInteger verifier = gen.generateVerifier(salt, email, password);
+        credentialsMap.put(email, new SRP6Credentials(salt.toString(16), verifier.toString(16)));
+        return true;
     }
 
     @Override
