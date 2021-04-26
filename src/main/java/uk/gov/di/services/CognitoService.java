@@ -25,9 +25,9 @@ public class CognitoService implements AuthenticationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(CognitoService.class);
 
-    private CognitoIdentityProviderClient cognitoClient;
-    private final String clientId = "3pf8i39bspmlkmd9pqo1s626oe";
-    private final String userPoolId = "eu-west-2_JVIkRJSaV";
+    protected CognitoIdentityProviderClient cognitoClient;
+    protected final String clientId = "3pf8i39bspmlkmd9pqo1s626oe";
+    protected final String userPoolId = "eu-west-2_JVIkRJSaV";
 
     public CognitoService(CognitoIdentityProviderClient cognitoClient) {
         this.cognitoClient = cognitoClient;
