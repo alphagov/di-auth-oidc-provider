@@ -49,7 +49,8 @@ def dependencyVersions = [
         nimbus_jose_jwt: '9.8.1',
         junit_version: '5.6.0',
         mockito_version: '3.9.0',
-        jdbi_version: '3.19.0'
+        jdbi_version: '3.19.0',
+        srp_version: '2.1.0'
 ]
 
 dependencies {
@@ -64,7 +65,8 @@ dependencies {
             "org.jdbi:jdbi3-jackson2:${dependencyVersions.jdbi_version}",
             "org.postgresql:postgresql:42.2.19",
             "software.amazon.awssdk:cognitoidentityprovider:2.16.43",
-            "software.amazon.awssdk:cognitoidentity:2.16.43"
+            "software.amazon.awssdk:cognitoidentity:2.16.43",
+            "com.nimbusds:srp6a:${dependencyVersions.srp_version}"
 
     constraints {
         implementation 'com.fasterxml.jackson.core:jackson-core:2.12.3'
