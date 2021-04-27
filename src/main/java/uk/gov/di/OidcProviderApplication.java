@@ -29,6 +29,7 @@ import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.PostgresService;
+import uk.gov.di.services.SRPUserService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
 
@@ -88,15 +89,14 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
     private AuthenticationService getAuthenticationService(
             OidcProviderConfiguration configuration) {
         LOG.info("getAuthenticationService={}", configuration.getAuthenticationServiceProvider());
-        if (configuration.getAuthenticationServiceProvider() == COGNITO) {
-            CognitoIdentityProviderClient cognitoIdentityClient =
-                    CognitoIdentityProviderClient.builder()
+        return
+                switch (configuration.getAuthenticationServiceProvider()) {
+                    case COGNITO -> new CognitoService(CognitoIdentityProviderClient.builder()
                             .region(Region.EU_WEST_2)
                             .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
-                            .build();
-            return new CognitoService(cognitoIdentityClient);
-        } else {
-            return new UserService();
-        }
+                            .build());
+                    case SRP -> new SRPUserService();
+                    default -> new UserService();
+                };
     }
 }
