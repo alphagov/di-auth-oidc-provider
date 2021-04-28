@@ -23,6 +23,10 @@ import static org.mockito.Mockito.mock;
 class ClientServiceTest {
     private static final AuthorizationCodeService AUTHORIZATION_CODE_SERVICE =
             mock(AuthorizationCodeService.class);
+
+    private static final ClientConfigService CLIENT_CONFIG_SERVICE =
+            mock(ClientConfigService.class);
+
     private static final ClientService CLIENT_SERVICE =
             new ClientService(
                     List.of(
@@ -34,7 +38,8 @@ class ClientServiceTest {
                                     List.of("code"),
                                     List.of("http://localhost:8080"),
                                     List.of("contact@example.com"))),
-                    AUTHORIZATION_CODE_SERVICE);
+                    AUTHORIZATION_CODE_SERVICE,
+                    CLIENT_CONFIG_SERVICE);
 
     @Test
     void validatesRegisteredClientSuccessfully() {

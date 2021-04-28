@@ -18,10 +18,12 @@ public class ClientService {
 
     private List<Client> clients;
     private AuthorizationCodeService authorizationCodeService;
+    private final ClientConfigService clientConfigService;
 
-    public ClientService(List<Client> clients, AuthorizationCodeService authorizationCodeService) {
+    public ClientService(List<Client> clients, AuthorizationCodeService authorizationCodeService, ClientConfigService clientConfigService) {
         this.clients = clients;
         this.authorizationCodeService = authorizationCodeService;
+        this.clientConfigService = clientConfigService;
     }
 
     public Optional<ErrorObject> getErrorForAuthorizationRequest(AuthorizationRequest authRequest) {
@@ -69,6 +71,7 @@ public class ClientService {
                 "email",
                 "profile"
         ), List.of("code"), redirectUris, contacts);
+        clientConfigService.addClient(client);
         clients.add(client);
         return client;
     }

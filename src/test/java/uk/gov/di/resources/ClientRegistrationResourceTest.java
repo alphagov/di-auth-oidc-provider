@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.client.Entity;
@@ -19,11 +20,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class ClientRegistrationResourceTest {
 
-    private static final ClientService CLIENT_SERVICE = new ClientService(new ArrayList<>(), null);
+    private static final ClientConfigService CLIENT_CONFIG_SERVICE = mock(ClientConfigService.class);
+    private static final ClientService CLIENT_SERVICE = new ClientService(new ArrayList<>(), null, CLIENT_CONFIG_SERVICE);
     private static final ResourceExtension CLIENT_REGISTRATION_RESOURCE =
             ResourceExtension.builder()
                     .addResource(new ClientRegistrationResource(CLIENT_SERVICE))

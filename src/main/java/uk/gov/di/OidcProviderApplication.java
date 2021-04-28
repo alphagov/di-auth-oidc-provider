@@ -34,8 +34,6 @@ import uk.gov.di.services.SRPUserService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
 
-import static uk.gov.di.configuration.OidcProviderConfiguration.AuthenticationServiceProvider.COGNITO;
-
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OidcProviderApplication.class);
@@ -71,7 +69,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var authorizationCodeService = new AuthorizationCodeService();
         var clientService =
-                new ClientService(clientConfigService.getClients(), authorizationCodeService);
+                new ClientService(clientConfigService.getClients(), authorizationCodeService, clientConfigService);
         var authenticationService = getAuthenticationService(configuration);
         var tokenService = new TokenService(configuration);
 
