@@ -18,6 +18,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.resources.AuthorisationResource;
+import uk.gov.di.resources.ClientRegistrationResource;
 import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.LogoutResource;
 import uk.gov.di.resources.RegistrationResource;
@@ -82,6 +83,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
                 .register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new LogoutResource());
         env.jersey().register(new RegistrationResource(authenticationService));
+        env.jersey().register(new ClientRegistrationResource(clientService));
         env.jersey()
                 .property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
     }

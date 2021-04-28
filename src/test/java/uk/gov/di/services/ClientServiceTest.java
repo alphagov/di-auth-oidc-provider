@@ -27,11 +27,13 @@ class ClientServiceTest {
             new ClientService(
                     List.of(
                             new Client(
+                                    "client-name",
                                     "test-id",
                                     "test-secret",
                                     List.of("email"),
                                     List.of("code"),
-                                    List.of("http://localhost:8080"))),
+                                    List.of("http://localhost:8080"),
+                                    List.of("contact@example.com"))),
                     AUTHORIZATION_CODE_SERVICE);
 
     @Test

@@ -12,6 +12,7 @@ import uk.gov.di.helpers.AuthenticationResponseHelper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ClientService {
 
@@ -57,6 +58,19 @@ public class ClientService {
         Optional<Client> client = getClient(clientId);
         return client.map(c -> c.clientSecret().equals(clientSecret))
                 .orElse(false);
+    }
+
+    public Client addClient(String clientName, List<String> redirectUris, List<String> contacts) {
+
+        String clientId = UUID.randomUUID().toString();
+        String clientSecret = UUID.randomUUID().toString();
+        Client client = new Client(clientName, clientId, clientSecret, List.of(
+                "openid",
+                "email",
+                "profile"
+        ), List.of("code"), redirectUris, contacts);
+        clients.add(client);
+        return client;
     }
 
     private Optional<Client> getClient(String clientId) {
