@@ -26,7 +26,7 @@ public class ClientConfigService {
                                         (rs, ctx) -> {
                                             try {
                                                 return new Client(
-                                                        "Test Clients",
+                                                        rs.getString("client_name"),
                                                         rs.getString("client_id"),
                                                         rs.getString("client_secret"),
                                                         MAPPER.readValue(
@@ -42,7 +42,10 @@ public class ClientConfigService {
                                                                 rs.getString("redirect_urls"),
                                                                 new TypeReference<
                                                                         List<String>>() {}),
-                                                        List.of());
+                                                        MAPPER.readValue(
+                                                                rs.getString("contacts"),
+                                                                new TypeReference<
+                                                                        List<String>>() {}));
                                             } catch (JsonProcessingException e) {
                                                 e.printStackTrace();
                                                 return null;
