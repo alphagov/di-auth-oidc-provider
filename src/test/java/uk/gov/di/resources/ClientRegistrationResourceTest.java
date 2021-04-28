@@ -1,7 +1,6 @@
 package uk.gov.di.resources;
 
 import com.codahale.metrics.MetricRegistry;
-import io.dropwizard.testing.junit5.DropwizardExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
 import io.dropwizard.views.ViewMessageBodyWriter;
@@ -10,8 +9,6 @@ import org.apache.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import uk.gov.di.entity.Client;
 import uk.gov.di.services.ClientService;
 
 import javax.ws.rs.client.Entity;
@@ -20,13 +17,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class ClientRegistrationResourceTest {
@@ -57,10 +49,6 @@ class ClientRegistrationResourceTest {
                 .post(Entity.form(registrationResourceFormParams));
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
-
-        Client client = response.readEntity(Client.class);
-        assertNotNull(client.clientId());
-        assertNotNull(client.clientSecret());
     }
 
 }

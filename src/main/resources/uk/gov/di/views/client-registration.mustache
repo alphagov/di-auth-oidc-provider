@@ -1,0 +1,36 @@
+{{<layout}}
+    {{$title}}Register a client{{/title}}
+    {{$mainContent}}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">
+                    Register a client
+                </h1>
+                <h2 class="govuk-heading-s">
+                    Create a client
+                </h2>
+                <form class="form" method="post">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="client_name">
+                            Client name
+                        </label>
+                        <input class="govuk-input" id="client_name" name="client_name" type="text" spellcheck="false" required="required">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="redirect_uris">
+                            Redirect URI
+                        </label>
+                        <input class="govuk-input" id="redirect_uris" name="redirect_uris" type="text" spellcheck="false" required="required">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="contacts">
+                            Contacts
+                        </label>
+                        <input class="govuk-input" id="contacts" name="contacts" type="email" spellcheck="false" required="required">
+                    </div>
+                    <button class="govuk-button" data-module="govuk-button">Register</button>
+                </form>
+            </div>
+        </div>
+    {{/mainContent}}
+{{/layout}}
