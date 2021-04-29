@@ -9,6 +9,7 @@ import io.dropwizard.views.View;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.entity.Client;
 import uk.gov.di.services.ClientService;
+import uk.gov.di.views.ClientNotAuthorisedView;
 import uk.gov.di.views.ClientRegistrationView;
 import uk.gov.di.views.SuccessfulClientRegistrationView;
 
@@ -65,5 +66,13 @@ public class ClientRegistrationResource {
         Client client = clientService.addClient(clientName, redirectUris, contacts);
 
         return new SuccessfulClientRegistrationView(client);
+    }
+
+    @GET
+    @Path("/notauthorised")
+    @Produces(MediaType.TEXT_HTML)
+    public View clientRegistration() {
+
+        return new ClientNotAuthorisedView();
     }
 }

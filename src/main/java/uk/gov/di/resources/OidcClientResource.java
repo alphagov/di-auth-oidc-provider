@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @Path("/client")
 public class OidcClientResource {
@@ -45,9 +46,11 @@ public class OidcClientResource {
         var accessToken = getToken(code);
         var userInfo = getUserInfo(accessToken);
 
-//        if (!allowedEmails.contains(userInfo.getEmailAddress())) {
-//            return Response.temporaryRedirect(URI.create("/connect/notauthorised")).build();
-//        }
+        List<String> allowedEmails = List.of("joe.bloggs@digital.cabinet-office.gov.uk");
+
+        if (!allowedEmails.contains(userInfo.getEmailAddress())) {
+            return Response.temporaryRedirect(URI.create("/connect/notauthorised")).build();
+        }
         return Response.temporaryRedirect(URI.create("/connect/register")).cookie(
                 new NewCookie(
                         "clientRegistrationCookie",
@@ -62,7 +65,7 @@ public class OidcClientResource {
     }
 
 
-    private UserInfo getUserInfo(AccessToken accessToken) throws IOException, URISyntaxException, ParseException {
+    private UserInfo getUserInfo(AccessToken accessToken) throws IOException, ParseException {
         var httpResponse = new UserInfoRequest(URI.create("http://localhost:8080/userinfo"), new BearerAccessToken(accessToken.toString()))
                 .toHTTPRequest()
                 .send();
