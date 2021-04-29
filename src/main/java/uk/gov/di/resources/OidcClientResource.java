@@ -18,6 +18,7 @@ import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.configuration.OidcProviderConfiguration;
+import uk.gov.di.services.ClientConfigService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,9 +36,11 @@ public class OidcClientResource {
 
     private OidcProviderConfiguration config;
     private static final Logger LOG = LoggerFactory.getLogger(OidcClientResource.class);
+    private ClientConfigService clientConfigService;
 
-    public OidcClientResource(OidcProviderConfiguration config) {
+    public OidcClientResource(OidcProviderConfiguration config, ClientConfigService clientConfigService) {
         this.config = config;
+        this.clientConfigService = clientConfigService;
     }
 
     @GET
@@ -46,9 +49,7 @@ public class OidcClientResource {
         var accessToken = getToken(code);
         var userInfo = getUserInfo(accessToken);
 
-        List<String> allowedEmails = List.of("joe.bloggs@digital.cabinet-office.gov.uk");
-
-        if (!allowedEmails.contains(userInfo.getEmailAddress())) {
+        if (!clientConfigService.isAuthorisedToRegisterClients(userInfo.getEmailAddress())) {
             return Response.temporaryRedirect(URI.create("/connect/notauthorised")).build();
         }
         return Response.temporaryRedirect(URI.create("/connect/register")).cookie(

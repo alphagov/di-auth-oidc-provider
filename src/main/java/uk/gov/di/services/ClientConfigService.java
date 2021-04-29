@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
 import uk.gov.di.entity.Client;
 
 import java.util.List;
@@ -61,5 +62,12 @@ public class ClientConfigService {
                     .bindMethods(client)
                     .execute()
         );
+    }
+
+    public boolean isAuthorisedToRegisterClients(String email) {
+        return database.withHandle(handle ->
+                !handle.createQuery("SELECT email FROM registration_whitelist WHERE email = :email")
+                .bind("email", email).collectInto(new GenericType<List<String>>() {}).isEmpty()
+                );
     }
 }
