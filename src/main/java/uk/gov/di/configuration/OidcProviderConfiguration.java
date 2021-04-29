@@ -23,11 +23,21 @@ public class OidcProviderConfiguration extends Configuration {
 
     @JsonProperty @NotNull private String issuer;
     @JsonProperty @NotNull private AuthenticationServiceProvider authenticationServiceProvider;
+    @JsonProperty @NotNull private String clientId;
+    @JsonProperty @NotNull private String clientSecret;
 
     @Valid private DataSourceFactory database;
 
     public String getIssuer() {
         return issuer;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
     }
 
     public AuthenticationServiceProvider getAuthenticationServiceProvider() {

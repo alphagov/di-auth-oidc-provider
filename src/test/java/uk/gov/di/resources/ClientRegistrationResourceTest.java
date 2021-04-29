@@ -29,7 +29,7 @@ class ClientRegistrationResourceTest {
     private static final ClientService CLIENT_SERVICE = new ClientService(new ArrayList<>(), null, CLIENT_CONFIG_SERVICE);
     private static final ResourceExtension CLIENT_REGISTRATION_RESOURCE =
             ResourceExtension.builder()
-                    .addResource(new ClientRegistrationResource(CLIENT_SERVICE))
+                    .addResource(new ClientRegistrationResource(CLIENT_SERVICE, null))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
