@@ -28,8 +28,6 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
 
 @Path("/client")
 public class OidcClientResource {
@@ -45,7 +43,7 @@ public class OidcClientResource {
 
     @GET
     @Path("/callback")
-    public Response oidcCallback(@QueryParam("code") String code) throws URISyntaxException, ParseException, IOException {
+    public Response oidcCallback(@QueryParam("code") String code) throws ParseException, IOException {
         var accessToken = getToken(code);
         var userInfo = getUserInfo(accessToken);
 
@@ -67,7 +65,8 @@ public class OidcClientResource {
 
 
     private UserInfo getUserInfo(AccessToken accessToken) throws IOException, ParseException {
-        var httpResponse = new UserInfoRequest(URI.create("http://localhost:8080/userinfo"), new BearerAccessToken(accessToken.toString()))
+        URI userInfoUri = config.getBaseUrl().resolve("/userinfo");
+        var httpResponse = new UserInfoRequest(userInfoUri, new BearerAccessToken(accessToken.toString()))
                 .toHTTPRequest()
                 .send();
 
@@ -82,10 +81,12 @@ public class OidcClientResource {
     }
 
     private AccessToken getToken(String authcode) throws ParseException, IOException {
-        var codeGrant = new AuthorizationCodeGrant(new AuthorizationCode(authcode), URI.create("http://localhost:8080/client/callback"));
+        URI redirectUri = config.getBaseUrl().resolve("/client/callback");
+        URI tokenUri = config.getBaseUrl().resolve("/token");
+        var codeGrant = new AuthorizationCodeGrant(new AuthorizationCode(authcode), redirectUri);
 
         var clientSecretPost = new ClientSecretPost(new ClientID(config.getClientId()), new Secret(config.getClientSecret()));
-        var request = new TokenRequest(URI.create("http://localhost:8080/token"), clientSecretPost, codeGrant, new Scope("openid"));
+        var request = new TokenRequest(tokenUri, clientSecretPost, codeGrant, new Scope("openid"));
         var tokenResponse = OIDCTokenResponseParser.parse(request.toHTTPRequest().send());
 
         if (! tokenResponse.indicatesSuccess()) {

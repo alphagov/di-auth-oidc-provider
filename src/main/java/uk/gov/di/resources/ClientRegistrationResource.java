@@ -48,11 +48,12 @@ public class ClientRegistrationResource {
         if (loggedIn) {
             return Response.ok(new ClientRegistrationView()).build();
         }
+        URI redirectURI = config.getBaseUrl().resolve("/client/callback");
         var authorizationRequest = new AuthorizationRequest.Builder(
                 new ResponseType(ResponseType.Value.CODE), new ClientID(config.getClientId()))
                 .scope(new Scope("openid", "profile", "email"))
                 .state(new State())
-                .redirectionURI(URI.create("http://localhost:8080/client/callback"))
+                .redirectionURI(redirectURI)
                 .endpointURI(URI.create("/authorize"))
                 .build();
 
@@ -62,7 +63,7 @@ public class ClientRegistrationResource {
     @POST
     @Path("/register")
     @Produces(MediaType.TEXT_HTML)
-    public View clientRegistration(@FormParam("client_name") @NotEmpty String clientName,
+    public Response clientRegistration(@FormParam("client_name") @NotEmpty String clientName,
                                        @FormParam("redirect_uris") @NotEmpty List<String> redirectUris,
                                        @FormParam("contacts") @NotEmpty List<String> contacts,
                                        @CookieParam("clientRegistrationCookie") Optional<String> user) {
@@ -71,9 +72,9 @@ public class ClientRegistrationResource {
         if (loggedIn) {
             Client client = clientService.addClient(clientName, redirectUris, contacts);
 
-            return new SuccessfulClientRegistrationView(client);
+            return Response.ok(new SuccessfulClientRegistrationView(client)).build();
         }
-        return new ClientNotAuthorisedView();
+        return Response.status(HttpStatus.SC_UNAUTHORIZED).entity(new ClientNotAuthorisedView()).build();
     }
 
     @GET

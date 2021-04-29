@@ -17,3 +17,5 @@ database:
 clientId: admin_client_id
 
 clientSecret: admin_client_secret
+
+baseUrl: ${BASE_URL:-http://localhost:8080/}
