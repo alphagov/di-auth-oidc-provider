@@ -10,6 +10,8 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.di.entity.Client;
+import uk.gov.di.services.ClientService;
 import uk.gov.di.services.UserService;
 
 import javax.ws.rs.client.Entity;
@@ -18,6 +20,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,10 +33,11 @@ import static org.mockito.Mockito.when;
 public class LoginResourceTest {
 
     private static final UserService USER_SERVICE = mock(UserService.class);
+    private static final ClientService CLIENT_SERVICE = mock(ClientService.class);
 
     private static final ResourceExtension loginResource =
             ResourceExtension.builder()
-                    .addResource(new LoginResource(USER_SERVICE))
+                    .addResource(new LoginResource(USER_SERVICE, CLIENT_SERVICE))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
@@ -51,6 +56,16 @@ public class LoginResourceTest {
         when(USER_SERVICE.userExists(anyString())).thenReturn(false);
         when(USER_SERVICE.userExists(eq("joe.bloggs@digital.cabinet-office.gov.uk")))
                 .thenReturn(true);
+        when(CLIENT_SERVICE.getClient(anyString())).thenReturn(
+                Optional.of(new Client("Dummy Service",
+                        "anything",
+                        "anything",
+                        List.of(),
+                        List.of(),
+                        List.of(),
+                        List.of())
+
+                ));
     }
 
     @Test
@@ -101,7 +116,7 @@ public class LoginResourceTest {
 
     private Response loginRequest(String email, String password) {
         MultivaluedMap<String, String> loginResourceFormParams = new MultivaluedHashMap<>();
-        loginResourceFormParams.add("authRequest", "whatever");
+        loginResourceFormParams.add("authRequest", "client_id=whatever&response_type=code&redirect_uri=http://localhost&scope=openid&state=123456");
         loginResourceFormParams.add("email", email);
         loginResourceFormParams.add("password", password);
         return loginResource

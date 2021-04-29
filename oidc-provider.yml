@@ -13,3 +13,9 @@ database:
   url: ${DATABASE_URL:-jdbc:postgresql://localhost:15432/store}
   user: user
   password: pass
+
+clientId: admin_client_id
+
+clientSecret: admin_client_secret
+
+baseUrl: ${BASE_URL:-http://localhost:8080/}

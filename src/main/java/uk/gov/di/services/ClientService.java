@@ -12,15 +12,18 @@ import uk.gov.di.helpers.AuthenticationResponseHelper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ClientService {
 
     private List<Client> clients;
     private AuthorizationCodeService authorizationCodeService;
+    private final ClientConfigService clientConfigService;
 
-    public ClientService(List<Client> clients, AuthorizationCodeService authorizationCodeService) {
+    public ClientService(List<Client> clients, AuthorizationCodeService authorizationCodeService, ClientConfigService clientConfigService) {
         this.clients = clients;
         this.authorizationCodeService = authorizationCodeService;
+        this.clientConfigService = clientConfigService;
     }
 
     public Optional<ErrorObject> getErrorForAuthorizationRequest(AuthorizationRequest authRequest) {
@@ -32,7 +35,7 @@ public class ClientService {
 
         var client = clientMaybe.get();
 
-        if (!client.redirectUris().contains(authRequest.getRedirectionURI().toString())) {
+        if (!client.redirectUrls().contains(authRequest.getRedirectionURI().toString())) {
             return Optional.of(OAuth2Error.INVALID_REQUEST_URI);
         }
 
@@ -59,7 +62,21 @@ public class ClientService {
                 .orElse(false);
     }
 
-    private Optional<Client> getClient(String clientId) {
+    public Client addClient(String clientName, List<String> redirectUris, List<String> contacts) {
+
+        String clientId = UUID.randomUUID().toString();
+        String clientSecret = UUID.randomUUID().toString();
+        Client client = new Client(clientName, clientId, clientSecret, List.of(
+                "openid",
+                "email",
+                "profile"
+        ), List.of("code"), redirectUris, contacts);
+        clientConfigService.addClient(client);
+        clients.add(client);
+        return client;
+    }
+
+    public Optional<Client> getClient(String clientId) {
         return clients.stream().filter(t -> t.clientId().equals(clientId)).findFirst();
     }
 }

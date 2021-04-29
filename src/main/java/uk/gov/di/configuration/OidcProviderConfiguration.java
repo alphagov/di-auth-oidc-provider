@@ -6,6 +6,7 @@ import io.dropwizard.db.DataSourceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 public class OidcProviderConfiguration extends Configuration {
 
@@ -23,11 +24,26 @@ public class OidcProviderConfiguration extends Configuration {
 
     @JsonProperty @NotNull private String issuer;
     @JsonProperty @NotNull private AuthenticationServiceProvider authenticationServiceProvider;
+    @JsonProperty @NotNull private String clientId;
+    @JsonProperty @NotNull private String clientSecret;
+    @JsonProperty @NotNull private URI baseUrl;
 
     @Valid private DataSourceFactory database;
 
     public String getIssuer() {
         return issuer;
+    }
+
+    public URI getBaseUrl() {
+        return baseUrl;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
     }
 
     public AuthenticationServiceProvider getAuthenticationServiceProvider() {

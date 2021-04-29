@@ -18,8 +18,10 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.resources.AuthorisationResource;
+import uk.gov.di.resources.ClientRegistrationResource;
 import uk.gov.di.resources.LoginResource;
 import uk.gov.di.resources.LogoutResource;
+import uk.gov.di.resources.OidcClientResource;
 import uk.gov.di.resources.RegistrationResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
@@ -32,8 +34,6 @@ import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.SRPUserService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
-
-import static uk.gov.di.configuration.OidcProviderConfiguration.AuthenticationServiceProvider.COGNITO;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
@@ -70,18 +70,20 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         var clientConfigService = new ClientConfigService(jdbiFactory);
         var authorizationCodeService = new AuthorizationCodeService();
         var clientService =
-                new ClientService(clientConfigService.getClients(), authorizationCodeService);
+                new ClientService(clientConfigService.getClients(), authorizationCodeService, clientConfigService);
         var authenticationService = getAuthenticationService(configuration);
         var tokenService = new TokenService(configuration);
 
+        env.jersey().register(new OidcClientResource(configuration, clientConfigService));
         env.jersey().register(new AuthorisationResource(clientService));
-        env.jersey().register(new LoginResource(authenticationService));
+        env.jersey().register(new LoginResource(authenticationService, clientService));
         env.jersey().register(new RegistrationResource(authenticationService));
         env.jersey().register(new UserInfoResource(tokenService, authenticationService));
         env.jersey()
                 .register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new LogoutResource());
         env.jersey().register(new RegistrationResource(authenticationService));
+        env.jersey().register(new ClientRegistrationResource(clientService, configuration));
         env.jersey()
                 .property(ServerProperties.LOCATION_HEADER_RELATIVE_URI_RESOLUTION_DISABLED, true);
     }

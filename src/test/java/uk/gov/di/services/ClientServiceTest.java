@@ -13,26 +13,37 @@ import org.junit.jupiter.api.Test;
 import uk.gov.di.entity.Client;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class ClientServiceTest {
     private static final AuthorizationCodeService AUTHORIZATION_CODE_SERVICE =
             mock(AuthorizationCodeService.class);
+
+    private static final ClientConfigService CLIENT_CONFIG_SERVICE =
+            mock(ClientConfigService.class);
+
     private static final ClientService CLIENT_SERVICE =
             new ClientService(
-                    List.of(
+                    new ArrayList<>(List.of(
                             new Client(
+                                    "client-name",
                                     "test-id",
                                     "test-secret",
                                     List.of("email"),
                                     List.of("code"),
-                                    List.of("http://localhost:8080"))),
-                    AUTHORIZATION_CODE_SERVICE);
+                                    List.of("http://localhost:8080"),
+                                    List.of("contact@example.com")))),
+                    AUTHORIZATION_CODE_SERVICE,
+                    CLIENT_CONFIG_SERVICE);
 
     @Test
     void validatesRegisteredClientSuccessfully() {
@@ -112,5 +123,18 @@ class ClientServiceTest {
                                 new State()));
 
         assertEquals(OAuth2Error.INVALID_REQUEST_URI, error.get());
+    }
+
+    @Test
+    void shouldBeAbleToAddNewClient() {
+        Client client = CLIENT_SERVICE.addClient(
+                "test-client",
+                singletonList("http://some-service/redirect"),
+                singletonList("test-client@test.com")
+        );
+
+        verify(CLIENT_CONFIG_SERVICE).addClient(eq(client));
+
+        assertEquals(client, CLIENT_SERVICE.getClient(client.clientId()).get());
     }
 }
