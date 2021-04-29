@@ -10,5 +10,5 @@ public record Client(
         String clientSecret,
         @Json List<String> scopes,
         @Json List<String> allowedResponseTypes,
-        @Json List<String> redirectUris,
+        @Json List<String> redirectUrls,
         @Json List<String> contacts) {}
