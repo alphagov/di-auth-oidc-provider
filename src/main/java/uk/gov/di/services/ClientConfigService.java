@@ -66,8 +66,8 @@ public class ClientConfigService {
 
     public boolean isAuthorisedToRegisterClients(String email) {
         return database.withHandle(handle ->
-                !handle.createQuery("SELECT email FROM registration_whitelist WHERE email = :email")
-                .bind("email", email).collectInto(new GenericType<List<String>>() {}).isEmpty()
+                handle.createQuery("SELECT COUNT(email) FROM registration_whitelist WHERE email = :email")
+                .bind("email", email).mapTo(Integer.class).one() == 1
                 );
     }
 }
