@@ -35,7 +35,7 @@ public class ClientService {
 
         var client = clientMaybe.get();
 
-        if (!client.redirectUris().contains(authRequest.getRedirectionURI().toString())) {
+        if (!client.redirectUrls().contains(authRequest.getRedirectionURI().toString())) {
             return Optional.of(OAuth2Error.INVALID_REQUEST_URI);
         }
 

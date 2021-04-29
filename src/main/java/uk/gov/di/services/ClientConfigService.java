@@ -1,9 +1,8 @@
 package uk.gov.di.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.ConstructorMapper;
 import uk.gov.di.entity.Client;
 
 import java.util.List;
@@ -21,43 +20,16 @@ public class ClientConfigService {
     public List<Client> getClients() {
         return database.withHandle(
                 handle ->
-                        handle.createQuery("SELECT * FROM client;")
-                                .map(
-                                        (rs, ctx) -> {
-                                            try {
-                                                return new Client(
-                                                        rs.getString("client_name"),
-                                                        rs.getString("client_id"),
-                                                        rs.getString("client_secret"),
-                                                        MAPPER.readValue(
-                                                                rs.getString("scopes"),
-                                                                new TypeReference<
-                                                                        List<String>>() {}),
-                                                        MAPPER.readValue(
-                                                                rs.getString(
-                                                                        "allowed_response_types"),
-                                                                new TypeReference<
-                                                                        List<String>>() {}),
-                                                        MAPPER.readValue(
-                                                                rs.getString("redirect_urls"),
-                                                                new TypeReference<
-                                                                        List<String>>() {}),
-                                                        MAPPER.readValue(
-                                                                rs.getString("contacts"),
-                                                                new TypeReference<
-                                                                        List<String>>() {}));
-                                            } catch (JsonProcessingException e) {
-                                                e.printStackTrace();
-                                                return null;
-                                            }
-                                        })
+                        handle.registerRowMapper(ConstructorMapper.factory(Client.class))
+                                .createQuery("SELECT * FROM client;")
+                                .mapTo(Client.class)
                                 .list());
     }
 
     public void addClient(Client client) {
         database.useHandle(handle ->
             handle.createUpdate("INSERT INTO client (client_name, client_id, client_secret, scopes, allowed_response_types, redirect_urls, contacts )" +
-                    "VALUES(:clientName, :clientId, :clientSecret, :scopes, :allowedResponseTypes, :redirectUris, :contacts)")
+                    "VALUES(:clientName, :clientId, :clientSecret, :scopes, :allowedResponseTypes, :redirectUrls, :contacts)")
                     .bindMethods(client)
                     .execute()
         );

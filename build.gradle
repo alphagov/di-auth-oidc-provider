@@ -97,6 +97,10 @@ run {
     }
 }
 
+compileJava {
+    options.compilerArgs += ['-parameters']
+}
+
 task cfPush(type: Exec) {
     commandLine 'cf', 'push', 'di-auth-oidc-provider', '-p', 'build/distributions/di-auth-oidc-provider.zip'
 }
