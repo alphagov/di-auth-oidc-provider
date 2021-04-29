@@ -76,7 +76,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
         env.jersey().register(new OidcClientResource(configuration, clientConfigService));
         env.jersey().register(new AuthorisationResource(clientService));
-        env.jersey().register(new LoginResource(authenticationService));
+        env.jersey().register(new LoginResource(authenticationService, clientService));
         env.jersey().register(new RegistrationResource(authenticationService));
         env.jersey().register(new UserInfoResource(tokenService, authenticationService));
         env.jersey()

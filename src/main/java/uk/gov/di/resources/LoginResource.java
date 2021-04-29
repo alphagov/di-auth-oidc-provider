@@ -1,7 +1,10 @@
 package uk.gov.di.resources;
 
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import io.dropwizard.views.View;
 import uk.gov.di.services.AuthenticationService;
+import uk.gov.di.services.ClientService;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;
@@ -25,9 +28,11 @@ import java.net.URI;
 public class LoginResource {
 
     private final AuthenticationService authenticationService;
+    private final ClientService clientService;
 
-    public LoginResource(AuthenticationService authenticationService) {
+    public LoginResource(AuthenticationService authenticationService, ClientService clientService) {
         this.authenticationService = authenticationService;
+        this.clientService = clientService;
     }
 
     @GET
@@ -59,11 +64,12 @@ public class LoginResource {
     public Response validateLogin(
             @FormParam("authRequest") String authRequest,
             @FormParam("email") String email,
-            @FormParam("password") String password) {
+            @FormParam("password") String password) throws ParseException {
         boolean isValid = authenticationService.login(email, password);
-
         if (isValid) {
-            return Response.ok(new SuccessfulLoginView(authRequest))
+            AuthenticationRequest request = AuthenticationRequest.parse(authRequest);
+            String clientName = clientService.getClient(request.getClientID().getValue()).get().clientName();
+            return Response.ok(new SuccessfulLoginView(authRequest, clientName))
                     .cookie(
                             new NewCookie(
                                     "userCookie",

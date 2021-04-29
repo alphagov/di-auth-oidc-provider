@@ -76,7 +76,7 @@ public class ClientService {
         return client;
     }
 
-    private Optional<Client> getClient(String clientId) {
+    public Optional<Client> getClient(String clientId) {
         return clients.stream().filter(t -> t.clientId().equals(clientId)).findFirst();
     }
 }
