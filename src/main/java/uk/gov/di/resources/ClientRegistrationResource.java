@@ -6,6 +6,7 @@ import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import io.dropwizard.views.View;
+import org.apache.http.HttpStatus;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.entity.Client;
 import uk.gov.di.services.ClientService;
@@ -20,7 +21,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
@@ -53,7 +56,7 @@ public class ClientRegistrationResource {
                 .endpointURI(URI.create("/authorize"))
                 .build();
 
-        return Response.temporaryRedirect(authorizationRequest.toURI()).build();
+        return Response.status(HttpStatus.SC_MOVED_TEMPORARILY).location(authorizationRequest.toURI()).build();
     }
 
     @POST
@@ -74,5 +77,21 @@ public class ClientRegistrationResource {
     public View clientRegistration() {
 
         return new ClientNotAuthorisedView();
+    }
+
+
+    @POST
+    @Path("/logout")
+    public Response logout() {
+        return Response.status(HttpStatus.SC_MOVED_TEMPORARILY).location(URI.create("/logout?redirectUri=/connect/register")).cookie(new NewCookie(
+                "clientRegistrationCookie",
+                null,
+                "/",
+                null,
+                Cookie.DEFAULT_VERSION,
+                null,
+                0,
+                false))
+                .build();
     }
 }
