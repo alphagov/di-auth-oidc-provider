@@ -64,11 +64,16 @@ public class ClientRegistrationResource {
     @Produces(MediaType.TEXT_HTML)
     public View clientRegistration(@FormParam("client_name") @NotEmpty String clientName,
                                        @FormParam("redirect_uris") @NotEmpty List<String> redirectUris,
-                                       @FormParam("contacts") @NotEmpty List<String> contacts) {
+                                       @FormParam("contacts") @NotEmpty List<String> contacts,
+                                       @CookieParam("clientRegistrationCookie") Optional<String> user) {
 
-        Client client = clientService.addClient(clientName, redirectUris, contacts);
+        boolean loggedIn = user.isPresent();
+        if (loggedIn) {
+            Client client = clientService.addClient(clientName, redirectUris, contacts);
 
-        return new SuccessfulClientRegistrationView(client);
+            return new SuccessfulClientRegistrationView(client);
+        }
+        return new ClientNotAuthorisedView();
     }
 
     @GET
