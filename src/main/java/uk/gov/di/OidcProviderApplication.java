@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.ClientRegistrationResource;
@@ -31,10 +32,13 @@ import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.CognitoService;
+import uk.gov.di.services.DynamoService;
 import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.SRPUserService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
+
+import java.util.Optional;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
@@ -79,7 +83,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(authenticationService, clientService));
         env.jersey().register(new RegistrationResource(authenticationService));
-        env.jersey().register(new UserInfoResource(tokenService, authenticationService));
+        env.jersey().register(new UserInfoResource(tokenService, authenticationService, Optional.of(new DynamoService(getDynamoDb(configuration)))));
         env.jersey()
                 .register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new LogoutResource());
@@ -102,5 +106,12 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
                     case SRP -> new SRPUserService();
                     default -> new UserService();
                 };
+    }
+
+    private DynamoDbClient getDynamoDb(OidcProviderConfiguration configuration) {
+        return DynamoDbClient.builder()
+                .region(Region.EU_WEST_2)
+                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                .build();
     }
 }
