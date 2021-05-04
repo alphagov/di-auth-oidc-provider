@@ -1,30 +1,30 @@
 package uk.gov.di.resources;
 
 import com.nimbusds.oauth2.sdk.AuthorizationRequest;
+import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseType;
 import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.client.ClientRegistrationResponse;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import io.dropwizard.views.View;
 import org.apache.http.HttpStatus;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.entity.Client;
+import uk.gov.di.entity.ClientRegistrationRequest;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.views.ClientNotAuthorisedView;
 import uk.gov.di.views.ClientRegistrationView;
 import uk.gov.di.views.SuccessfulClientRegistrationView;
 
 import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -77,11 +77,22 @@ public class ClientRegistrationResource {
         return Response.status(HttpStatus.SC_UNAUTHORIZED).entity(new ClientNotAuthorisedView()).build();
     }
 
+    @POST
+    @Path("/register")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response clientRegistrationJson(ClientRegistrationRequest clientRegistrationRequest) {
+        Client client = clientService.addClient(
+                clientRegistrationRequest.clientName(),
+                clientRegistrationRequest.redirectUris(),
+                clientRegistrationRequest.contacts());
+        return Response.ok(client).build();
+    }
+
     @GET
     @Path("/notauthorised")
     @Produces(MediaType.TEXT_HTML)
     public View clientRegistration() {
-
         return new ClientNotAuthorisedView();
     }
 
