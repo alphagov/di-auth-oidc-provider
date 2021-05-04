@@ -10,6 +10,8 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.di.configuration.OidcProviderConfiguration;
+import uk.gov.di.entity.Client;
+import uk.gov.di.entity.ClientRegistrationRequest;
 import uk.gov.di.services.ClientConfigService;
 import uk.gov.di.services.ClientService;
 
@@ -20,8 +22,10 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -95,5 +99,24 @@ class ClientRegistrationResourceTest {
                 .get();
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
+    }
+
+    @Test
+    void shouldReturnSuccessfulRestfulResponse() {
+        ClientRegistrationRequest request = new ClientRegistrationRequest(
+                "restful_test_client",
+                List.of("http://example.com"),
+                List.of("contact@example.com")
+        );
+        final Response response = CLIENT_REGISTRATION_RESOURCE
+                .target("/connect/register")
+                .request()
+                .post(Entity.json(request));
+
+        assertEquals(HttpStatus.SC_OK, response.getStatus());
+        Client client = response.readEntity(Client.class);
+        assertEquals("restful_test_client", client.clientName());
+        assertNotNull(client.clientId());
+        assertNotNull(client.clientSecret());
     }
 }
