@@ -96,7 +96,7 @@ public class WellKnownResource {
                 "email",
                 "email_verified",
                 "locale",
-                "zoneinfo",
+                "zoneinfo"
             ],
             "claims_parameter_supported": true,
             "service_documentation": "http://di-auth-oidc-provider.london.cloudapps.digitalservice/_documentation.html",
