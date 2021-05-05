@@ -42,6 +42,7 @@ public class UserInfoResource {
 
             return Response.ok(userInfo.toJSONObject()).build();
         } catch (ParseException e) {
+            LOG.info("UserInfoResource.userinfo ParseException {}", e);
             return Response.status(HttpStatus.SC_UNAUTHORIZED).build();
         }
     }
