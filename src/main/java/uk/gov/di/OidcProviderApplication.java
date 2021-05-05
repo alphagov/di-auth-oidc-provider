@@ -25,6 +25,7 @@ import uk.gov.di.resources.OidcClientResource;
 import uk.gov.di.resources.RegistrationResource;
 import uk.gov.di.resources.TokenResource;
 import uk.gov.di.resources.UserInfoResource;
+import uk.gov.di.resources.WellKnownResource;
 import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientConfigService;
@@ -82,6 +83,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey()
                 .register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new LogoutResource());
+        env.jersey().register(new WellKnownResource());
         env.jersey().register(new RegistrationResource(authenticationService));
         env.jersey().register(new ClientRegistrationResource(clientService, configuration));
         env.jersey()
