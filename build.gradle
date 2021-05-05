@@ -67,6 +67,8 @@ dependencies {
             "software.amazon.awssdk:cognitoidentityprovider:2.16.43",
             "software.amazon.awssdk:cognitoidentity:2.16.43",
             "software.amazon.awssdk:dynamodb:2.16.54",
+            "software.amazon.awssdk:kms:2.16.47",
+            "com.amazonaws:aws-dynamodb-encryption-java:2.0.1",
             "com.nimbusds:srp6a:${dependencyVersions.srp_version}"
 
     constraints {

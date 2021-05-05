@@ -1,5 +1,7 @@
 package uk.gov.di;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -16,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.resources.AuthorisationResource;
 import uk.gov.di.resources.ClientRegistrationResource;
@@ -83,7 +84,10 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey().register(new AuthorisationResource(clientService));
         env.jersey().register(new LoginResource(authenticationService, clientService));
         env.jersey().register(new RegistrationResource(authenticationService));
-        env.jersey().register(new UserInfoResource(tokenService, authenticationService, Optional.of(new DynamoService(getDynamoDb(configuration)))));
+
+        var dynamoService = new DynamoService(getDynamoDb(configuration));
+        dynamoService.writeStubData();
+        env.jersey().register(new UserInfoResource(tokenService, authenticationService, Optional.of(dynamoService)));
         env.jersey()
                 .register(new TokenResource(tokenService, clientService, authorizationCodeService));
         env.jersey().register(new LogoutResource());
@@ -108,10 +112,10 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
                 };
     }
 
-    private DynamoDbClient getDynamoDb(OidcProviderConfiguration configuration) {
-        return DynamoDbClient.builder()
-                .region(Region.EU_WEST_2)
-                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+    private AmazonDynamoDB getDynamoDb(OidcProviderConfiguration configuration) {
+        return AmazonDynamoDBClientBuilder.standard()
+                .withRegion(Region.EU_WEST_2.toString())
+                .withCredentials(new com.amazonaws.auth.EnvironmentVariableCredentialsProvider())
                 .build();
     }
 }
