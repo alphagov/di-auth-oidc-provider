@@ -9,12 +9,15 @@ import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.DynamoService;
 import uk.gov.di.services.TokenService;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 import java.util.Optional;
 
 @Path("/userinfo")
@@ -56,5 +59,15 @@ public class UserInfoResource {
             LOG.info("UserInfoResource.userinfo ParseException {}", e);
             return Response.status(HttpStatus.SC_UNAUTHORIZED).build();
         }
+    }
+
+    @POST
+    public Response postUserInfo(@FormParam("userId")String userId,
+                                 @FormParam("attributeName")String attributeName,
+                                 @FormParam("attributeValue")String attributeValue) {
+
+        dynamoService.get().writeStubData(userId, Map.of(attributeName, attributeValue));
+
+        return Response.ok().build();
     }
 }

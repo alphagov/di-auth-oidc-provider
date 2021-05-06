@@ -1,14 +1,12 @@
 package uk.gov.di.services;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.AttributeEncryptor;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.DynamoDBEncryptor;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionContext;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.EncryptionFlags;
 import com.amazonaws.services.dynamodbv2.datamodeling.encryption.providers.DirectKmsMaterialProvider;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.AttributeValueUpdate;
 import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.kms.AWSKMS;
 import com.amazonaws.services.kms.AWSKMSClientBuilder;
@@ -75,19 +73,27 @@ public class DynamoService {
         return userInfo;
     }
 
-    public void writeStubData(String userId, String familyName, String givenName) {
+    public void writeStubData(String userId, Map<String, String> attributes) {
         final Map<String, AttributeValue> record = new HashMap<>();
 
         record.put(PARTITION_KEY_NAME, new AttributeValue().withS(userId));
-        record.put(FAMILY_NAME, new AttributeValue().withS(familyName));
-        record.put(GIVEN_NAME, new AttributeValue().withS(givenName));
+
+        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            record.put(attribute.getKey(), new AttributeValue().withS(attribute.getValue()));
+        }
 
         final Map<String, Set<EncryptionFlags>> actions = actionFlags(record);
 
-        final Map<String, AttributeValue> encrypted_record;
+        final Map<String, AttributeValue> encryptedRecords;
+        final Map<String, AttributeValueUpdate> attributeValueUpdates = new HashMap<>();
         try {
-            encrypted_record = encryptor.encryptRecord(record, actions, encryptionContext);
-            dynamoDbClient.putItem(TABLE_NAME, encrypted_record);
+            encryptedRecords = encryptor.encryptRecord(record, actions, encryptionContext);
+            encryptedRecords.remove(PARTITION_KEY_NAME);
+
+            for (Map.Entry<String, AttributeValue> attribute : encryptedRecords.entrySet()) {
+                attributeValueUpdates.put(attribute.getKey(), new AttributeValueUpdate(attribute.getValue(), "PUT"));
+            }
+            dynamoDbClient.updateItem(TABLE_NAME, Map.of(PARTITION_KEY_NAME, new AttributeValue().withS(userId)), attributeValueUpdates);
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
