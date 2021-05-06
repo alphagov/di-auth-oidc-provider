@@ -62,12 +62,19 @@ public class UserInfoResource {
     }
 
     @POST
-    public Response postUserInfo(@FormParam("userId")String userId,
-                                 @FormParam("attributeName")String attributeName,
-                                 @FormParam("attributeValue")String attributeValue) {
+    public Response postUserInfo(@HeaderParam("Authorization") String authorizationHeader,
+                                 @FormParam("attributeName") String attributeName,
+                                 @FormParam("attributeValue") String attributeValue) {
+        try {
+            AccessToken accessToken = AccessToken.parse(authorizationHeader);
+            var email = tokenService.getEmailForToken(accessToken);
 
-        dynamoService.get().writeStubData(userId, Map.of(attributeName, attributeValue));
+            dynamoService.get().writeStubData(email, Map.of(attributeName, attributeValue));
 
-        return Response.ok().build();
+            return Response.ok().build();
+        } catch (ParseException e) {
+            LOG.info("UserInfoResource.userinfo ParseException {}", e);
+            return Response.status(HttpStatus.SC_UNAUTHORIZED).build();
+        }
     }
 }
