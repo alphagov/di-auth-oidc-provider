@@ -86,7 +86,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
         env.jersey().register(new RegistrationResource(authenticationService));
 
         var dynamoService = new DynamoService(getDynamoDb(configuration));
-        dynamoService.writeStubData();
+        dynamoService.writeStubData("joe.bloggs@digital.cabinet-office.gov.uk","Bloggs", "Joe");
         env.jersey().register(new UserInfoResource(tokenService, authenticationService, Optional.of(dynamoService)));
         env.jersey()
                 .register(new TokenResource(tokenService, clientService, authorizationCodeService));

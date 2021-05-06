@@ -57,13 +57,4 @@ public class UserInfoResource {
             return Response.status(HttpStatus.SC_UNAUTHORIZED).build();
         }
     }
-
-    @GET
-    @Path("userinfoDb")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response userinfoDb(@HeaderParam("Authorization") String authorizationHeader) {
-        dynamoService.get().getUserInfo("joe.bloggs@digital.cabinet-office.gov.uk");
-        return Response.status(HttpStatus.SC_BAD_REQUEST).build();
-    }
-
 }

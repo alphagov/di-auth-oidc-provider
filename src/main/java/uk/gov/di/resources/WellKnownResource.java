@@ -1,5 +1,7 @@
 package uk.gov.di.resources;
 
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderEndpointMetadata;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
