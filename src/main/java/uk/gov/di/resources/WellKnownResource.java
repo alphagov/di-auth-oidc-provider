@@ -1,11 +1,27 @@
 package uk.gov.di.resources;
 
+import com.nimbusds.jose.jwk.JWKSet;
+import uk.gov.di.configuration.OidcProviderConfiguration;
+import uk.gov.di.services.TokenService;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+
+import static java.text.MessageFormat.format;
 
 @Path("/.well-known/")
 public class WellKnownResource {
+
+    private TokenService tokenService;
+    private OidcProviderConfiguration configuration;
+
+    public WellKnownResource(TokenService tokenService, OidcProviderConfiguration configuration) {
+        this.tokenService = tokenService;
+        this.configuration = configuration;
+    }
+
     @GET
     @Path("/openid-configuration")
     @Produces("application/json")
@@ -13,9 +29,9 @@ public class WellKnownResource {
         
         return """
         {
-            "issuer": "https://di-auth-oidc-provider.london.cloudapps.digital",
-            "authorization_endpoint": "https://di-auth-oidc-provider.london.cloudapps.digital/authorize",
-            "token_endpoint": "https://di-auth-oidc-provider.london.cloudapps.digital/token",
+            "issuer": "<baseUrl>",
+            "authorization_endpoint": "<baseUrl>authorize",
+            "token_endpoint": "<baseUrl>token",
             "token_endpoint_auth_methods_supported": [
                 "client_secret_basic"
             ],
@@ -23,9 +39,9 @@ public class WellKnownResource {
                 "RS256",
                 "ES256"
             ],
-            "userinfo_endpoint": "https://di-auth-oidc-provider.london.cloudapps.digital/userinfo",
-            "jwks_uri": "https://di-auth-oidc-provider.london.cloudapps.digital/jwks.json",
-            "registration_endpoint": "https://di-auth-oidc-provider.london.cloudapps.digital/register",
+            "userinfo_endpoint": "<baseUrl>userinfo",
+            "jwks_uri": "<baseUrl>.well-known/jwks.json",
+            "registration_endpoint": "<baseUrl>register",
             "scopes_supported": [
                 "openid",
                 "profile",
@@ -105,11 +121,17 @@ public class WellKnownResource {
                 "en-GB"
             ]
         }
-        """;
+        """.replace("<baseUrl>", configuration.getBaseUrl().toString());
         
         
     }
 
+    @GET
+    @Path("/jwks.json")
+    @Produces("application/json")
+    public Response jwks() {
+        JWKSet jwkSet = new JWKSet(tokenService.getSigningKey());
 
-
+        return Response.ok(jwkSet.toJSONObject(true)).build();
+    }
 }

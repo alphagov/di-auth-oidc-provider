@@ -5,6 +5,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -20,28 +21,36 @@ import uk.gov.di.configuration.OidcProviderConfiguration;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TokenService {
+
+    private final RSAKey signingKey;
+    private final JWSSigner signer;
+    private final Issuer issuer;
 
     private OidcProviderConfiguration config;
     private final Map<AccessToken, String> tokensMap = new HashMap<>();
 
     public TokenService(OidcProviderConfiguration config) {
         this.config = config;
+        this.issuer = new Issuer(config.getBaseUrl().toString());
+        try {
+            signingKey = new RSAKeyGenerator(2048).keyID(UUID.randomUUID().toString()).generate();
+            signer = new RSASSASigner(signingKey);
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public SignedJWT generateIDToken(String clientId) {
+    public SignedJWT generateIDToken(String clientId, Subject subject) {
         LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(2);
         Date expiryDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
         IDTokenClaimsSet idTokenClaims =
                 new IDTokenClaimsSet(
-                        new Issuer(config.getIssuer()),
-                        new Subject(),
+                        issuer,
+                        subject,
                         List.of(new Audience(clientId)),
                         expiryDate,
                         new Date());
@@ -52,17 +61,15 @@ public class TokenService {
         } catch (ParseException e) {
             throw new RuntimeException("Can't convert IDTokenClaimsSet to JWTClaimsSet");
         }
-        RSAKey signingKey = createSigningKey();
         JWSHeader jwsHeader =
                 new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(signingKey.getKeyID()).build();
         SignedJWT idToken;
 
         try {
-            JWSSigner signer = new RSASSASigner(signingKey);
             idToken = new SignedJWT(jwsHeader, jwtClaimsSet);
             idToken.sign(signer);
         } catch (JOSEException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
 
         return idToken;
@@ -79,11 +86,7 @@ public class TokenService {
         return tokensMap.get(token);
     }
 
-    private RSAKey createSigningKey() {
-        try {
-            return new RSAKeyGenerator(2048).keyID("123").generate();
-        } catch (JOSEException e) {
-            throw new RuntimeException("Unable to create RSA key");
-        }
+    public JWK getSigningKey() {
+        return signingKey;
     }
 }
