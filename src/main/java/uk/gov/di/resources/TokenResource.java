@@ -5,8 +5,10 @@ import com.nimbusds.oauth2.sdk.AuthorizationCode;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 import org.apache.http.HttpStatus;
+import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.AuthorizationCodeService;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.TokenService;
@@ -25,14 +27,16 @@ public class TokenResource {
 
     private final TokenService tokenService;
     private final ClientService clientService;
+    private final AuthenticationService authenticationService;
     private final AuthorizationCodeService authorizationCodeService;
 
     public TokenResource(
             TokenService tokenService,
             ClientService clientService,
-            AuthorizationCodeService authorizationCodeService) {
+            AuthenticationService authenticationService, AuthorizationCodeService authorizationCodeService) {
         this.tokenService = tokenService;
         this.clientService = clientService;
+        this.authenticationService = authenticationService;
         this.authorizationCodeService = authorizationCodeService;
     }
 
@@ -56,7 +60,8 @@ public class TokenResource {
         }
 
         AccessToken accessToken = tokenService.issueToken(email.get());
-        SignedJWT idToken = tokenService.generateIDToken(clientId);
+        UserInfo userInfo = authenticationService.getInfoForEmail(email.get());
+        SignedJWT idToken = tokenService.generateIDToken(clientId, userInfo.getSubject());
 
         OIDCTokens oidcTokens = new OIDCTokens(idToken, accessToken, null);
         OIDCTokenResponse tokenResponse = new OIDCTokenResponse(oidcTokens);
