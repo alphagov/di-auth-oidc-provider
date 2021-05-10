@@ -115,6 +115,7 @@ public class WellKnownResource {
                 "zoneinfo"
             ],
             "claims_parameter_supported": true,
+            "grant_types_supported": ["authorization_code"],
             "service_documentation": "http://di-auth-oidc-provider.london.cloudapps.digitalservice/_documentation.html",
             "ui_locales_supported": [
                 "en-US",
