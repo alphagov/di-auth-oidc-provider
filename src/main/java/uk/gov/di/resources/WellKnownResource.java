@@ -1,6 +1,15 @@
 package uk.gov.di.resources;
 
+import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.oauth2.sdk.GrantType;
+import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
+import com.nimbusds.oauth2.sdk.id.Issuer;
+import com.nimbusds.openid.connect.sdk.SubjectType;
+import com.nimbusds.openid.connect.sdk.claims.ClaimType;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 import uk.gov.di.configuration.OidcProviderConfiguration;
 import uk.gov.di.services.TokenService;
 
@@ -8,6 +17,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 import static java.text.MessageFormat.format;
 
@@ -25,107 +38,29 @@ public class WellKnownResource {
     @GET
     @Path("/openid-configuration")
     @Produces("application/json")
-    public String openIdConfiguration() {
-        
-        return """
-        {
-            "issuer": "<baseUrl>",
-            "authorization_endpoint": "<baseUrl>authorize",
-            "token_endpoint": "<baseUrl>token",
-            "token_endpoint_auth_methods_supported": [
-                "client_secret_basic"
-            ],
-            "token_endpoint_auth_signing_alg_values_supported": [
-                "RS256",
-                "ES256"
-            ],
-            "userinfo_endpoint": "<baseUrl>userinfo",
-            "jwks_uri": "<baseUrl>.well-known/jwks.json",
-            "registration_endpoint": "<baseUrl>register",
-            "scopes_supported": [
-                "openid",
-                "profile",
-                "email"
-            ],
-            "response_types_supported": [
-                "code",
-                "code id_token",
-                "id_token",
-                "token id_token"
-            ],
-            "acr_values_supported": [],
-            "subject_types_supported": [
-                "public",
-                "pairwise"
-            ],
-            "userinfo_signing_alg_values_supported": [
-                "RS256",
-                "ES256",
-                "HS256"
-            ],
-            "userinfo_encryption_alg_values_supported": [
-                "RSA1_5",
-                "A128KW"
-            ],
-            "userinfo_encryption_enc_values_supported": [
-                "A128CBC-HS256",
-                "A128GCM"
-            ],
-            "id_token_signing_alg_values_supported": [
-                "RS256",
-                "ES256",
-                "HS256"
-            ],
-            "id_token_encryption_alg_values_supported": [
-                "RSA1_5",
-                "A128KW"
-            ],
-            "id_token_encryption_enc_values_supported": [
-                "A128CBC-HS256",
-                "A128GCM"
-            ],
-            "request_object_signing_alg_values_supported": [
-                "none",
-                "RS256",
-                "ES256"
-            ],
-            "display_values_supported": [
-                "page",
-                "popup"
-            ],
-            "claim_types_supported": [
-                "normal",
-                "distributed"
-            ],
-            "claims_supported": [
-                "sub",
-                "iss",
-                "auth_time",
-                "acr",
-                "name",
-                "given_name",
-                "family_name",
-                "nickname",
-                "profile",
-                "picture",
-                "website",
-                "email",
-                "email_verified",
-                "locale",
-                "zoneinfo"
-            ],
-            "claims_parameter_supported": true,
-            "grant_types_supported": ["authorization_code"],
-            "service_documentation": "http://di-auth-oidc-provider.london.cloudapps.digitalservice/_documentation.html",
-            "ui_locales_supported": [
-                "en-US",
-                "en-GB"
-            ]
-        }
-        """.replace("<baseUrl>", configuration.getBaseUrl().toString());
-        
-        
+    public String openIdConfiguration() throws URISyntaxException {
+        var providerMetadata = new OIDCProviderMetadata(new Issuer(this.configuration.getBaseUrl()),
+                List.of(SubjectType.PUBLIC), buildURI(".well-known/jwks.json"));
+
+        providerMetadata.setTokenEndpointURI(buildURI("token"));
+        providerMetadata.setUserInfoEndpointURI(buildURI("userinfo"));
+        providerMetadata.setAuthorizationEndpointURI(buildURI("authorize"));
+        providerMetadata.setRegistrationEndpointURI(buildURI("connect/register"));
+        providerMetadata.setTokenEndpointAuthMethods(List.of(ClientAuthenticationMethod.CLIENT_SECRET_POST));
+        providerMetadata.setScopes(new Scope("openid", "profile", "email"));
+        providerMetadata.setResponseTypes(List.of(new ResponseType("code")));
+        providerMetadata.setGrantTypes(List.of(GrantType.AUTHORIZATION_CODE));
+        providerMetadata.setClaimTypes(List.of(ClaimType.NORMAL));
+        providerMetadata.setClaims(List.of("sub", "gender", "family_name", "given_name", "email"));
+        providerMetadata.setIDTokenJWSAlgs(List.of(JWSAlgorithm.RS256));
+
+        return providerMetadata.toString();
     }
+
+    private URI buildURI(String prefix) throws URISyntaxException {
+        return new URI(this.configuration.getBaseUrl().toString() + prefix);
+    }
+
 
     @GET
     @Path("/jwks.json")
