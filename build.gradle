@@ -66,6 +66,8 @@ dependencies {
             "org.postgresql:postgresql:42.2.19",
             "software.amazon.awssdk:cognitoidentityprovider:2.16.43",
             "software.amazon.awssdk:cognitoidentity:2.16.43",
+            "com.amazonaws:aws-lambda-java-core:1.2.1",
+            "com.amazonaws:aws-lambda-java-events:2.2.5",
             "com.nimbusds:srp6a:${dependencyVersions.srp_version}"
 
     constraints {
