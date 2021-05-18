@@ -6,3 +6,4 @@ logs/
 .project
 .settings/
 bin/
+ci/terraform/.terraform/
