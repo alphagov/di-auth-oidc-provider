@@ -7,12 +7,14 @@ import io.dropwizard.views.ViewMessageBodyWriter;
 import io.dropwizard.views.mustache.MustacheViewRenderer;
 import org.apache.http.HttpStatus;
 import org.glassfish.jersey.client.ClientProperties;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.di.entity.Client;
 import uk.gov.di.services.ClientService;
 import uk.gov.di.services.UserService;
+import uk.gov.di.services.ValidationService;
+import uk.gov.di.validation.EmailValidation;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -20,24 +22,28 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class LoginResourceTest {
 
-    private static final UserService USER_SERVICE = mock(UserService.class);
-    private static final ClientService CLIENT_SERVICE = mock(ClientService.class);
+    private final UserService USER_SERVICE = mock(UserService.class);
+    private final ClientService CLIENT_SERVICE = mock(ClientService.class);
+    private final ValidationService VALIDATION_SERVICE = mock(ValidationService.class);
 
-    private static final ResourceExtension loginResource =
+    private final ResourceExtension loginResource =
             ResourceExtension.builder()
-                    .addResource(new LoginResource(USER_SERVICE, CLIENT_SERVICE))
+                    .addResource(new LoginResource(USER_SERVICE, CLIENT_SERVICE, VALIDATION_SERVICE))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
@@ -48,8 +54,8 @@ public class LoginResourceTest {
                                     Collections.singleton(new MustacheViewRenderer())))
                     .build();
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         when(USER_SERVICE.login(anyString(), anyString())).thenReturn(false);
         when(USER_SERVICE.login(eq("joe.bloggs@digital.cabinet-office.gov.uk"), eq("password")))
                 .thenReturn(true);
@@ -112,6 +118,19 @@ public class LoginResourceTest {
 
         assertEquals(HttpStatus.SC_TEMPORARY_REDIRECT, response.getStatus());
         assertEquals("/registration", response.getLocation().getPath());
+    }
+
+    @Test
+    void shouldRedirectBackToLoginScreenIfEmailIsNotValid() {
+        final Response response =
+                loginRequest("this-is-not-a-valid-email-address", "blah");
+
+        Set<EmailValidation> emailValidationErrors = EnumSet.of(EmailValidation.EMPTY_EMAIL);
+
+        when(VALIDATION_SERVICE.validateEmailAddress(anyString())).thenReturn(emailValidationErrors);
+
+        assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, response.getStatus());
+        assertEquals("/login", response.getLocation().getPath());
     }
 
     private Response loginRequest(String email, String password) {
