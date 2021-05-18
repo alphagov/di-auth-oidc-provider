@@ -22,8 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static java.text.MessageFormat.format;
-
 @Path("/.well-known/")
 public class WellKnownResource {
 
