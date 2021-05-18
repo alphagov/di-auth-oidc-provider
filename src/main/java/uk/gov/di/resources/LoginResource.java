@@ -5,6 +5,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import io.dropwizard.views.View;
 import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.ClientService;
+import uk.gov.di.validation.EmailValidation;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;
@@ -23,12 +24,17 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import java.net.URI;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 @Path("/login")
 public class LoginResource {
 
     private final AuthenticationService authenticationService;
     private final ClientService clientService;
+
+    private static final Pattern emailRegex = Pattern.compile("[^@]+@[^@]+\\.[^@]*");
 
     public LoginResource(AuthenticationService authenticationService, ClientService clientService) {
         this.authenticationService = authenticationService;
@@ -46,6 +52,16 @@ public class LoginResource {
     @POST
     public Response login(
             @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
+        Set<EmailValidation> emailErrors = EnumSet.noneOf(EmailValidation.class);
+        if (email.isBlank()) {
+            emailErrors.add(EmailValidation.EMPTY_EMAIL);
+        }
+        if (!email.isBlank() && !emailRegex.matcher(email).matches()) {
+            emailErrors.add(EmailValidation.INCORRECT_FORMAT);
+        }
+        if (!emailErrors.isEmpty()) {
+            return Response.ok(new LoginView(authRequest, false, emailErrors)).build();
+        }
         if (authenticationService.userExists(email)) {
             return Response.ok(new PasswordView(authRequest, email)).build();
         } else {

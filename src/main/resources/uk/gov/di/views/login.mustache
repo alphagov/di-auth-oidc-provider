@@ -54,14 +54,26 @@
                 <h2 class="govuk-heading-s">
                     To sign in or create an account, enter your email address
                 </h2>
-                <form class="form" method="post">
+                <form class="form" method="post" novalidate>
                     <input type="hidden" value="{{authRequest}}" name="authRequest">
-                    <div class="govuk-form-group">
+
+                    <div class="govuk-form-group {{#emailInvalid}}govuk-form-group--error{{/emailInvalid}}">
                         <label class="govuk-label" for="email">
                             Email address
                         </label>
+                        {{#emailEmpty}}
+                            <span id="email-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> Enter your email address
+                        </span>
+                        {{/emailEmpty}}
+                        {{#incorrectEmailFormat}}
+                        <span id="email-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> Enter an email address in the correct format, like name@example.com
+                        </span>
+                        {{/incorrectEmailFormat}}
                         <input class="govuk-input" id="email" name="email" type="email" spellcheck="false" aria-describedby="email-hint" autocomplete="email" required="required">
                     </div>
+
                     <button class="govuk-button" data-module="govuk-button">Continue</button>
 
                 </form>
