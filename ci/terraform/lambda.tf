@@ -18,25 +18,13 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-resource "aws_lambda_function" "test_lambda" {
-  filename = "../../serverless/lambda/build/distributions/lambda.zip"
-  function_name = "HelloWorldAPIGatewayLambda"
-  role = aws_iam_role.iam_for_lambda.arn
-  handler = "uk.gov.di.example.HelloWorldAPIGatewayLambda::handleRequest"
-
-  source_code_hash = filebase64sha256("../../serverless/lambda/build/distributions/lambda.zip")
-
-  runtime = "java11"
-
-}
-
 resource "aws_lambda_function" "userinfo_lambda" {
-  filename = "../../serverless/lambda/build/distributions/lambda.zip"
+  filename = var.lambda-zip-file
   function_name = "UserInfoLambda"
   role = aws_iam_role.iam_for_lambda.arn
   handler = "uk.gov.di.userinfo.UserInfoHandler::handleRequest"
 
-  source_code_hash = filebase64sha256("../../serverless/lambda/build/distributions/lambda.zip")
+  source_code_hash = filebase64sha256(var.lambda-zip-file)
 
   runtime = "java11"
 }
