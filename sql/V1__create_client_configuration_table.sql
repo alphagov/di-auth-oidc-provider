@@ -1,4 +1,4 @@
-CREATE TABLE client (
+CREATE TABLE IF NOT EXISTS client (
     client_id VARCHAR(64) NOT NULL,
     client_secret VARCHAR(64) NOT NULL,
     scopes JSONB NOT NULL,
