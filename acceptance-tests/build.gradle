@@ -11,14 +11,22 @@ repositories {
     }
 }
 
+def dependencyVersions = [
+        junit_version: '5.6.0',
+        cucumber_version: '6.10.4'
+]
+
 dependencies {
-    testImplementation 'io.cucumber:cucumber-java:6.10.4'
-    testImplementation 'io.cucumber:cucumber-junit:6.10.4'
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation "io.cucumber:cucumber-java:${dependencyVersions.cucumber_version}",
+                       "io.cucumber:cucumber-junit:${dependencyVersions.cucumber_version}",
+                       "org.seleniumhq.selenium:selenium-java:3.141.59",
+                       "org.junit.jupiter:junit-jupiter-api:${dependencyVersions.junit_version}"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${dependencyVersions.junit_version}"
 }
 
 group = 'acceptance-tests'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.0'
 description = 'acceptance-tests'
 java.sourceCompatibility = JavaVersion.VERSION_16
 
