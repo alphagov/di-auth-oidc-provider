@@ -66,6 +66,7 @@ jobs:
                 cd di-auth-oidc-provider
                 gradle --no-daemon :serverless:lambda:buildZip
                 cp serverless/lambda/build/distributions/lambda.zip ../lambda-zip/
+
       - task: terraform-plan
         config:
           platform: linux
@@ -79,10 +80,6 @@ jobs:
             - name: di-auth-oidc-provider
           outputs:
             - name: terraform-plan
-          params:
-            AWS_ACCESS_KEY_ID: ((aws_access_key_id))
-            AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
-            AWS_REGION: eu-west-2
           run:
             path: /bin/sh
             args:
@@ -104,10 +101,6 @@ jobs:
             - name: lambda-zip
             - name: di-auth-oidc-provider
             - name: terraform-plan
-          params:
-            AWS_ACCESS_KEY_ID: ((aws_access_key_id))
-            AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
-            AWS_REGION: eu-west-2
           run:
             path: /bin/sh
             args:
