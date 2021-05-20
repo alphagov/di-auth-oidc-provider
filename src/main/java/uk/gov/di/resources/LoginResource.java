@@ -5,6 +5,8 @@ import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import io.dropwizard.views.View;
 import uk.gov.di.services.AuthenticationService;
 import uk.gov.di.services.ClientService;
+import uk.gov.di.services.ValidationService;
+import uk.gov.di.validation.EmailValidation;
 import uk.gov.di.views.LoginView;
 import uk.gov.di.views.PasswordView;
 import uk.gov.di.views.SuccessfulLoginView;
@@ -23,16 +25,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import java.net.URI;
+import java.util.Set;
 
 @Path("/login")
 public class LoginResource {
 
     private final AuthenticationService authenticationService;
     private final ClientService clientService;
+    private final ValidationService validationService;
 
-    public LoginResource(AuthenticationService authenticationService, ClientService clientService) {
+    public LoginResource(AuthenticationService authenticationService, ClientService clientService, ValidationService validationService) {
         this.authenticationService = authenticationService;
         this.clientService = clientService;
+        this.validationService = validationService;
     }
 
     @GET
@@ -46,6 +51,11 @@ public class LoginResource {
     @POST
     public Response login(
             @FormParam("authRequest") String authRequest, @FormParam("email") String email) {
+        Set<EmailValidation> emailErrors = validationService.validateEmailAddress(email);
+        if (!emailErrors.isEmpty()) {
+            return Response.ok(new LoginView(authRequest, false, emailErrors))
+                    .build();
+        }
         if (authenticationService.userExists(email)) {
             return Response.ok(new PasswordView(authRequest, email)).build();
         } else {

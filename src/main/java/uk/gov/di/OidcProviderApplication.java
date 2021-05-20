@@ -35,6 +35,7 @@ import uk.gov.di.services.PostgresService;
 import uk.gov.di.services.SRPUserService;
 import uk.gov.di.services.TokenService;
 import uk.gov.di.services.UserService;
+import uk.gov.di.services.ValidationService;
 
 public class OidcProviderApplication extends Application<OidcProviderConfiguration> {
 
@@ -77,7 +78,7 @@ public class OidcProviderApplication extends Application<OidcProviderConfigurati
 
         env.jersey().register(new OidcClientResource(configuration, clientConfigService));
         env.jersey().register(new AuthorisationResource(clientService));
-        env.jersey().register(new LoginResource(authenticationService, clientService));
+        env.jersey().register(new LoginResource(authenticationService, clientService, new ValidationService()));
         env.jersey().register(new RegistrationResource(authenticationService));
         env.jersey().register(new UserInfoResource(tokenService, authenticationService));
         env.jersey()
