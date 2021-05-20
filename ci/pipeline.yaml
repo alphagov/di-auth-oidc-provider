@@ -40,7 +40,83 @@ jobs:
         trigger: true
       - set_pipeline: di-auth-oidc-provider
         file: pipeline-src/ci/pipeline.yaml
-  
+
+
+  - name: deploy-lambda
+    plan:
+      - get: di-auth-oidc-provider
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: gradle
+              tag: 7.0.0-jdk11
+          inputs:
+            - name: di-auth-oidc-provider
+          outputs:
+            - name: lambda-zip
+          run:
+            path: /bin/bash
+            args:
+              - -euc
+              - |
+                cd di-auth-oidc-provider
+                gradle --no-daemon :serverless:lambda:buildZip
+                cp serverless/lambda/build/distributions/lambda.zip ../lambda-zip/
+      - task: terraform-plan
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: hashicorp/terraform
+              tag: 0.14.10
+          inputs:
+            - name: lambda-zip
+            - name: di-auth-oidc-provider
+          outputs:
+            - name: terraform-plan
+          params:
+            AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+            AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+            AWS_REGION: eu-west-2
+          run:
+            path: /bin/sh
+            args:
+              - -euc
+              - |
+                cd di-auth-oidc-provider/ci/terraform
+                terraform init
+                terraform plan -var 'lambda-zip-file=../../../lambda-zip/lambda.zip' -out=../../../terraform-plan/terraform.plan
+
+      - task: terraform-apply
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: hashicorp/terraform
+              tag: 0.14.10
+          inputs:
+            - name: lambda-zip
+            - name: di-auth-oidc-provider
+            - name: terraform-plan
+          params:
+            AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+            AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+            AWS_REGION: eu-west-2
+          run:
+            path: /bin/sh
+            args:
+              - -euc
+              - |
+                cd di-auth-oidc-provider/ci/terraform
+                terraform init
+                terraform apply -auto-approve ../../../terraform-plan/terraform.plan
+
   - name: deploy-app
     plan:
     - get: di-auth-oidc-provider
