@@ -14,7 +14,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import java.net.URI;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class StepDefinitions {
 
@@ -72,5 +71,35 @@ public class StepDefinitions {
     public void theUserIsPromptedForPassword() {
         assertEquals("/login", URI.create(driver.getCurrentUrl()).getPath());
         assertEquals("Sign-in to GOV.UK - Password", driver.getTitle());
+    }
+
+    @When("the user enters their password")
+    public void theUserEntersTheirPassword() {
+        WebElement passwordField = driver.findElement(By.id("password"));
+        passwordField.sendKeys(password);
+        WebElement continueButton = driver.findElement(By.xpath("//button[text()='Continue']"));
+        continueButton.click();
+    }
+
+    @Then("the user is taken to the Success page")
+    public void theUserIsTakenToTheSuccessPage() {
+        assertEquals("/login/validate", URI.create(driver.getCurrentUrl()).getPath());
+        assertEquals("Sign-in to GOV.UK - Success", driver.getTitle());
+    }
+
+    @When("the user clicks the {string} button")
+    public void theUserClicksTheSpecifiedButton(String buttonText) {
+        WebElement button = driver.findElement(By.xpath(String.format("//button[text()='%s']", buttonText)));
+        button.click();
+    }
+
+    @Then("the user is taken to the Service User Info page")
+    public void theUserIsTakenToTheServiceUserInfoPage() {
+        assertEquals("/oidc/callback", URI.create(driver.getCurrentUrl()).getPath());
+        assertEquals("localhost", URI.create(driver.getCurrentUrl()).getHost());
+        assertEquals(8081, URI.create(driver.getCurrentUrl()).getPort());
+        assertEquals("Example - GOV.UK - User Info", driver.getTitle());
+        WebElement emailDescriptionDetails = driver.findElement(By.id("user-info-email"));
+        assertEquals(emailAddress, emailDescriptionDetails.getText().trim());
     }
 }

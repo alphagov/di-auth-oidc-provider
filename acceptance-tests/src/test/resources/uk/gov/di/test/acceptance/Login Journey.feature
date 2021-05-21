@@ -9,4 +9,7 @@ Feature: Login Journey
     Then the user is taken to the Identity Provider Login Page
     When the user enters their email address
     Then the user is prompted for password
-
+    When the user enters their password
+    Then the user is taken to the Success page
+    When the user clicks the "Continue" button
+    Then the user is taken to the Service User Info page
