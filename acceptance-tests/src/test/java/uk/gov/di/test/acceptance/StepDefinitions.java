@@ -43,11 +43,6 @@ public class StepDefinitions {
     @When("the user visit the stub relying party")
     public void theUserVisitTheStubRelyingParty() {
         driver.get("http://localhost:8081");
-        new WebDriverWait(driver,30L).until(new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver d) {
-                return d.findElement(By.id("govuk-signin-button")) != null;
-            }
-        });
     }
 
     @And("the user clicks {string}")
@@ -58,10 +53,6 @@ public class StepDefinitions {
 
     @Then("The user is taken to the Identity Provider Login Page")
     public void theUserIsTakenToTheIdentityProviderLoginPage() {
-        new WebDriverWait(driver,30L).until(new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver d) {
-                return URI.create(driver.getCurrentUrl()).getPath().equals("/login");
-            }
-        });
+        assertEquals("/login", URI.create(driver.getCurrentUrl()).getPath());
     }
 }
