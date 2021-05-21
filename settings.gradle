@@ -1,4 +1,5 @@
 include 'serverless'
 include 'serverless:lambda'
 findProject(':serverless:lambda')?.name = 'lambda'
+include 'acceptance-tests'
 
