@@ -147,18 +147,24 @@ jobs:
         manifest: di-auth-oidc-provider/manifest.yml
         path: di-auth-oidc-provider-zip/di-auth-oidc-provider.zip
 
-    - put: di-auth-oidc-provider-upload
-      params:
-        command: push
-        app_name: selenium-firefox
-        manifest: di-auth-oidc-provider/manifest.yml
-
   - name: acceptance-tests
+    ensure:
+      do:
+      - put: di-auth-oidc-provider-upload
+        params:
+          command: delete
+          app_name: selenium-firefox
+          manifest: di-auth-oidc-provider/manifest.yml
     plan:
       - get: di-auth-oidc-provider
         passed:
           - deploy-app
-        trigger: true
+        trigger: false
+      - put: di-auth-oidc-provider-upload
+        params:
+          command: push
+          app_name: selenium-firefox
+          manifest: di-auth-oidc-provider/manifest.yml
       - task: test
         config:
           platform: linux
