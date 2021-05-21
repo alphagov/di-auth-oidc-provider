@@ -48,10 +48,8 @@ public class CognitoService implements AuthenticationService {
     @Override
     public boolean userExists(String email) {
         try {
-
             cognitoClient.adminGetUser(
                     AdminGetUserRequest.builder().userPoolId(userPoolId).username(email).build());
-
         } catch (CognitoIdentityProviderException e) {
             return false;
         }

@@ -60,7 +60,6 @@ public class LoginResource {
             return Response.ok(new PasswordView(authRequest, email)).build();
         } else {
             URI destination = UriBuilder.fromUri(URI.create("/registration")).build();
-
             return Response.status(Response.Status.TEMPORARY_REDIRECT)
                     .location(destination)
                     .build();
