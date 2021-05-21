@@ -41,7 +41,6 @@ jobs:
       - set_pipeline: di-auth-oidc-provider
         file: pipeline-src/ci/pipeline.yaml
 
-
   - name: deploy-lambda
     plan:
       - get: di-auth-oidc-provider
@@ -75,6 +74,8 @@ jobs:
             source:
               repository: hashicorp/terraform
               tag: 0.14.10
+          params:
+            DEPLOYER_ROLE_ARN: ((deployer-role-arn))
           inputs:
             - name: lambda-zip
             - name: di-auth-oidc-provider
@@ -86,8 +87,11 @@ jobs:
               - -euc
               - |
                 cd di-auth-oidc-provider/ci/terraform
-                terraform init
-                terraform plan -var 'lambda-zip-file=../../../lambda-zip/lambda.zip' -out=../../../terraform-plan/terraform.plan
+                terraform init -input=false -backend-config "role_arn=${DEPLOYER_ROLE_ARN}"
+                terraform plan \
+                  -var 'lambda-zip-file=../../../lambda-zip/lambda.zip' \
+                  -var "deployer-role-arn=${DEPLOYER_ROLE_ARN}" \
+                  -out=../../../terraform-plan/terraform.plan
 
       - task: terraform-apply
         config:
@@ -97,6 +101,8 @@ jobs:
             source:
               repository: hashicorp/terraform
               tag: 0.14.10
+          params:
+            DEPLOYER_ROLE_ARN: ((deployer-role-arn))
           inputs:
             - name: lambda-zip
             - name: di-auth-oidc-provider
@@ -107,7 +113,7 @@ jobs:
               - -euc
               - |
                 cd di-auth-oidc-provider/ci/terraform
-                terraform init
+                terraform init -input=false -backend-config "role_arn=${DEPLOYER_ROLE_ARN}"
                 terraform apply -auto-approve ../../../terraform-plan/terraform.plan
 
   - name: deploy-app
