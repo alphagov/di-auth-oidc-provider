@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.di.services.CognitoService;
 import uk.gov.di.services.UserService;
+import uk.gov.di.services.ValidationService;
+import uk.gov.di.validation.PasswordValidation;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -18,11 +20,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class RegistrationResourceTest {
@@ -30,10 +35,11 @@ class RegistrationResourceTest {
     private static final CognitoService COGNITO_SERVICE = mock(CognitoService.class);
 
     private static final UserService USER_SERVICE = mock(UserService.class);
+    private static final ValidationService VALIDATION_SERVICE = mock(ValidationService.class);
 
     private static final ResourceExtension REGISTRATION_RESOURCE =
             ResourceExtension.builder()
-                    .addResource(new RegistrationResource(USER_SERVICE))
+                    .addResource(new RegistrationResource(USER_SERVICE, VALIDATION_SERVICE))
                     .setClientConfigurator(
                             clientConfig -> {
                                 clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
@@ -55,8 +61,13 @@ class RegistrationResourceTest {
     }
 
     @Test
-    void shouldDisplayErrorIfPasswordsDoNotMatch() {
-        Response response = setPasswordRequest("", "reallysecure1234", "notmatchingpassword");
+    void shouldDisplayErrorIfPasswordsAreInvalidß() {
+        Set<PasswordValidation> passwordValidationErrors = EnumSet.of(PasswordValidation.PASSWORDS_DO_NOT_MATCH);
+        var password = "reallysecure1234";
+        var retypedPassword = "notmatchingpassword";
+
+        when(VALIDATION_SERVICE.validatePassword(password, retypedPassword)).thenReturn(passwordValidationErrors);
+        Response response = setPasswordRequest("", password, retypedPassword);
 
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
     }
