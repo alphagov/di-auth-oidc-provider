@@ -4,13 +4,8 @@ variable "lambda-zip-file" {
   type        = string
 }
 
-variable "aws_account" {
-  default = "761723964695"
-  type    = string
-}
-
-variable "deployer_role" {
-  default     = "concourse-deployer"
-  description = "The name of the AWS role to assume, when running locally use developer admin role (i.e. '<firstname>.<surname>-admin'"
+variable "deployer-role-arn" {
+  default     = ""
+  description = "The name of the AWS role to assume, leave blank when running locally"
   type        = string
 }
