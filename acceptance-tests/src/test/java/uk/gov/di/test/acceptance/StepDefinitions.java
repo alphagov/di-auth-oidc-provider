@@ -10,12 +10,25 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 
 public class StepDefinitions {
+
+    private static final String SELENIUM_URL = System.getenv().get("SELENIUM_URL");
+    private static final URI IDP_URL = URI.create(
+            System.getenv().getOrDefault("IDP_URL", "http://localhost:8080/")
+    );
+    private static final URI RP_URL = URI.create(
+            System.getenv().getOrDefault("RP_URL","http://localhost:8081/")
+    );
 
     private WebDriver driver;
 
@@ -23,8 +36,14 @@ public class StepDefinitions {
     private String password;
 
     @Before
-    public void setupWebdriver() {
-        driver = new FirefoxDriver();
+    public void setupWebdriver() throws MalformedURLException {
+        FirefoxOptions firefoxOptions = new FirefoxOptions();
+        firefoxOptions.setHeadless(true);
+        if (SELENIUM_URL == null) {
+            driver = new FirefoxDriver(firefoxOptions);
+        } else {
+            driver = new RemoteWebDriver(new URL(SELENIUM_URL), firefoxOptions);
+        }
     }
 
     @After
@@ -44,7 +63,7 @@ public class StepDefinitions {
 
     @When("the user visit the stub relying party")
     public void theUserVisitTheStubRelyingParty() {
-        driver.get("http://localhost:8081");
+        driver.get(RP_URL.toString());
     }
 
     @And("the user clicks {string}")
@@ -56,6 +75,7 @@ public class StepDefinitions {
     @Then("the user is taken to the Identity Provider Login Page")
     public void theUserIsTakenToTheIdentityProviderLoginPage() {
         assertEquals("/login", URI.create(driver.getCurrentUrl()).getPath());
+        assertEquals(IDP_URL.getHost(), URI.create(driver.getCurrentUrl()).getHost());
         assertEquals("Sign-in to GOV.UK - Email Address", driver.getTitle());
     }
 
@@ -96,8 +116,8 @@ public class StepDefinitions {
     @Then("the user is taken to the Service User Info page")
     public void theUserIsTakenToTheServiceUserInfoPage() {
         assertEquals("/oidc/callback", URI.create(driver.getCurrentUrl()).getPath());
-        assertEquals("localhost", URI.create(driver.getCurrentUrl()).getHost());
-        assertEquals(8081, URI.create(driver.getCurrentUrl()).getPort());
+        assertEquals(RP_URL.getHost(), URI.create(driver.getCurrentUrl()).getHost());
+        assertEquals(RP_URL.getPort(), URI.create(driver.getCurrentUrl()).getPort());
         assertEquals("Example - GOV.UK - User Info", driver.getTitle());
         WebElement emailDescriptionDetails = driver.findElement(By.id("user-info-email"));
         assertEquals(emailAddress, emailDescriptionDetails.getText().trim());
