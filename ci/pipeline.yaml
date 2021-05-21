@@ -143,7 +143,14 @@ jobs:
     - put: di-auth-oidc-provider-upload
       params:
         command: push
+        app_name: di-auth-oidc-provider
         manifest: di-auth-oidc-provider/manifest.yml
         path: di-auth-oidc-provider-zip/di-auth-oidc-provider.zip
+
+    - put: di-auth-oidc-provider-upload
+      params:
+        command: push
+        app_name: selenium-firefox
+        manifest: di-auth-oidc-provider/manifest.yml
 
 
