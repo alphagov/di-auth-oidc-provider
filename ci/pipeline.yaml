@@ -127,7 +127,7 @@ jobs:
           type: registry-image
           source:
             repository: gradle
-            tag: 7.0.0-jdk16
+            tag: 7.0.2-jdk16
         inputs:
           - name: di-auth-oidc-provider
         outputs:
@@ -153,4 +153,30 @@ jobs:
         app_name: selenium-firefox
         manifest: di-auth-oidc-provider/manifest.yml
 
-
+  - name: acceptance-tests
+    plan:
+      - get: di-auth-oidc-provider
+        passed:
+          - deploy-app
+        trigger: true
+      - task: test
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: gradle
+              tag: 7.0.2-jdk16
+          inputs:
+            - name: di-auth-oidc-provider
+          params:
+            SELENIUM_URL: https://selenium-firefox.london.cloudapps.digital/wd/hub
+            IDP_URL: https://di-auth-oidc-provider.london.cloudapps.digital
+            RP_URL: https://di-auth-stub-relying-party.london.cloudapps.digital
+          run:
+            path: /bin/bash
+            args:
+              - -euc
+              - |
+                cd di-auth-oidc-provider
+                gradle --no-daemon cucumber
