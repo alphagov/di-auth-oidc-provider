@@ -49,4 +49,7 @@ public class LoginView extends View {
         return !errorSet.isEmpty();
     }
 
+    public boolean isErrorPresent() {
+        return !errorSet.isEmpty() || failedLogin;
+    }
 }
