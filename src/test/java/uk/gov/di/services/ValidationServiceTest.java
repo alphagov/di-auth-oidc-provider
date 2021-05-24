@@ -85,4 +85,12 @@ public class ValidationServiceTest {
         assertEquals(Set.of(PasswordValidation.NO_NUMBER_INCLUDED, PasswordValidation.PASSWORD_TOO_SHORT),
                 validationService.validatePassword(shortPasswordWithNoNumbers, shortPasswordWithNoNumbers));
     }
+
+    @Test
+    public void shouldNotThrowNullPointerIfPasswordInputsAreNull() {
+        assertEquals(Set.of(PasswordValidation.EMPTY_PASSWORD_FIELD, PasswordValidation.EMPTY_RETYPE_PASSWORD_FIELD),
+                validationService.validatePassword(null, null));
+    }
+
+
 }
