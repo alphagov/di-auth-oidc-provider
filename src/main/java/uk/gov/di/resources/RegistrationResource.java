@@ -5,6 +5,8 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.services.AuthenticationService;
+import uk.gov.di.services.ValidationService;
+import uk.gov.di.validation.PasswordValidation;
 import uk.gov.di.views.ConfirmRegistrationView;
 import uk.gov.di.views.SetPasswordView;
 import uk.gov.di.views.SuccessfulRegistrationView;
@@ -22,14 +24,17 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import java.net.URI;
+import java.util.Set;
 
 @Path("/registration")
 public class RegistrationResource {
 
     private AuthenticationService authenticationService;
+    private ValidationService validationService;
 
-    public RegistrationResource(AuthenticationService authenticationService) {
+    public RegistrationResource(AuthenticationService authenticationService, ValidationService validationService) {
         this.authenticationService = authenticationService;
+        this.validationService = validationService;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RegistrationResource.class);
@@ -50,7 +55,8 @@ public class RegistrationResource {
             @FormParam("email") @NotNull String email,
             @FormParam("password") @NotNull String password,
             @FormParam("password-confirm") @NotNull String passwordConfirm) {
-        if (!password.isBlank() && password.equals(passwordConfirm)) {
+        Set<PasswordValidation> passwordValidationErrors = validationService.validatePassword(password, passwordConfirm);
+        if (passwordValidationErrors.isEmpty()) {
             authenticationService.signUp(email, password);
             if (authenticationService.isEmailVerificationRequired()) {
                 return Response.ok(new ConfirmRegistrationView(authRequest, email)).build();
@@ -70,7 +76,7 @@ public class RegistrationResource {
             }
         } else {
             return Response.status(HttpStatus.SC_BAD_REQUEST)
-                    .entity(new SetPasswordView(email, authRequest, true))
+                    .entity(new SetPasswordView(email, authRequest, passwordValidationErrors))
                     .build();
         }
     }
