@@ -148,6 +148,9 @@ jobs:
           path: di-auth-oidc-provider-zip/di-auth-oidc-provider.zip
 
   - name: acceptance-tests
+    serial: true
+    serial_groups:
+      - selenium-tests
     ensure:
       do:
         - task: tear-down-selenium
