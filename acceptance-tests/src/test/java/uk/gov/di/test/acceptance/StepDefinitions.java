@@ -16,6 +16,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -77,6 +78,13 @@ public class StepDefinitions {
     public void theUserHasInvalidPassword() {
         emailAddress = "joe.bloggs+1@digital.cabinet-office.gov.uk";
         password = "password";
+    }
+
+    @And("a new user has valid credentials")
+    public void theNewUserHasValidCredential() {
+        String randomString = UUID.randomUUID().toString();
+        emailAddress = "susan.bloggs+"+randomString+"@digital.cabinet-office.gov.uk";
+        password = "passw0rd1";
     }
 
     @When("the user visit the stub relying party")
@@ -141,6 +149,13 @@ public class StepDefinitions {
     public void theUserIsTakenToTheSuccessPage() {
         assertEquals("/login/validate", URI.create(driver.getCurrentUrl()).getPath());
         assertEquals("Sign-in to GOV.UK - Success", driver.getTitle());
+    }
+
+    @Then("the user is taken to the successfully registered page")
+    public void theUserIsTakenToTheSuccessfullyRegisteredPage() {
+        assertEquals("/registration/validate", URI.create(driver.getCurrentUrl()).getPath());
+        WebElement element = driver.findElement(By.id("successfully-created-account"));
+        assertEquals("You have successfully created your GOV.UK Account", element.getText().trim());
     }
 
     @Then("the user is taken to the Service User Info page")
