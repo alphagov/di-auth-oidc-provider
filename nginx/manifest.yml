@@ -13,6 +13,8 @@ applications:
 
     env:
       APP_NAME: ((app-name))
-      ALLOWED_IPS: |
-        allow 1.2.3.4/32;
-        allow 2.3.4.5/32;
+      ALLOWED_IPS: ((allowed-ips))
+
+  - name: selenium
+    docker:
+      image: selenium/standalone-firefox:latest
