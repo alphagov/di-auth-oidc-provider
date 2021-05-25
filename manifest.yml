@@ -12,7 +12,3 @@ applications:
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 16.+}}'
       AUTHENTICATION_SERVICE_PROVIDER: user
       BASE_URL: https://di-auth-oidc-provider.london.cloudapps.digital/
-
-  - name: selenium-firefox
-    docker:
-      image: selenium/standalone-firefox:latest

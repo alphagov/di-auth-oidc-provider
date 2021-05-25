@@ -118,53 +118,120 @@ jobs:
 
   - name: deploy-app
     plan:
-    - get: di-auth-oidc-provider
-      trigger: true
-    - task: build
-      config:
-        platform: linux
-        image_resource:
-          type: registry-image
-          source:
-            repository: gradle
-            tag: 7.0.2-jdk16
-        inputs:
-          - name: di-auth-oidc-provider
-        outputs:
-          - name: di-auth-oidc-provider-zip
-        run:
-          path: /bin/bash
-          args:
-            - -euc
-            - |
-              cd di-auth-oidc-provider
-              gradle --no-daemon build -x :acceptance-tests:test
-              cp build/distributions/di-auth-oidc-provider.zip ../di-auth-oidc-provider-zip/
-    - put: di-auth-oidc-provider-upload
-      params:
-        command: push
-        app_name: di-auth-oidc-provider
-        manifest: di-auth-oidc-provider/manifest.yml
-        path: di-auth-oidc-provider-zip/di-auth-oidc-provider.zip
-
-  - name: acceptance-tests
-    ensure:
-      do:
+      - get: di-auth-oidc-provider
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: gradle
+              tag: 7.0.2-jdk16
+          inputs:
+            - name: di-auth-oidc-provider
+          outputs:
+            - name: di-auth-oidc-provider-zip
+          run:
+            path: /bin/bash
+            args:
+              - -euc
+              - |
+                cd di-auth-oidc-provider
+                gradle --no-daemon build -x :acceptance-tests:test
+                cp build/distributions/di-auth-oidc-provider.zip ../di-auth-oidc-provider-zip/
       - put: di-auth-oidc-provider-upload
         params:
-          command: delete
-          app_name: selenium-firefox
+          command: push
+          app_name: di-auth-oidc-provider
           manifest: di-auth-oidc-provider/manifest.yml
+          path: di-auth-oidc-provider-zip/di-auth-oidc-provider.zip
+
+  - name: acceptance-tests
+    serial: true
+    serial_groups:
+      - selenium-tests
+    ensure:
+      do:
+        - task: tear-down-selenium
+          config:
+            platform: linux
+            image_resource:
+              type: registry-image
+              source:
+                repository: governmentpaas/cf-cli
+                tag: "3aa9f06a02907743df5eda0a9ad1b91b2837771b1cd8795e5deb548b9ae425f4"  # pragma: allowlist secret
+            inputs:
+              - name: di-auth-oidc-provider
+            params:
+              CF_USERNAME: ((cf-username))
+              CF_PASSWORD: ((cf-password))
+              CF_API_URL: https://api.london.cloud.service.gov.uk
+              CF_ORG_NAME: gds-digital-identity-authentication
+              CF_SPACE_NAME: sandbox
+            run:
+              path: bash
+              args:
+                - -eu
+                - -c
+                - |
+                  echo "Logging in to CloudFoundry..."
+                  cf login -a "${CF_API_URL}" -u "${CF_USERNAME}" -p "${CF_PASSWORD}" -o "${CF_ORG_NAME}" -s "${CF_SPACE_NAME}"
+
+                  cf unbind-route-service -f london.cloudapps.digital selenium-route-service --hostname selenium
+                  cf delete-service -f selenium-route-service
+                  cf delete -f selenium-route-service-app
+                  cf delete -f selenium
+
     plan:
       - get: di-auth-oidc-provider
         passed:
           - deploy-app
-        trigger: false
-      - put: di-auth-oidc-provider-upload
-        params:
-          command: push
-          app_name: selenium-firefox
-          manifest: di-auth-oidc-provider/manifest.yml
+        trigger: true
+      - task: deploy-selenium
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: governmentpaas/cf-cli
+              tag: "3aa9f06a02907743df5eda0a9ad1b91b2837771b1cd8795e5deb548b9ae425f4"  # pragma: allowlist secret
+          inputs:
+            - name: di-auth-oidc-provider
+          params:
+            CF_USERNAME: ((cf-username))
+            CF_PASSWORD: ((cf-password))
+            CF_API_URL: https://api.london.cloud.service.gov.uk
+            CF_ORG_NAME: gds-digital-identity-authentication
+            CF_SPACE_NAME: sandbox
+            CONCOURSE_EGRESS_IPS: ((readonly_egress_ips))
+          run:
+            path: bash
+            args:
+              - -eu
+              - -c
+              - |
+                echo "Logging in to CloudFoundry..."
+                cf login -a "${CF_API_URL}" -u "${CF_USERNAME}" -p "${CF_PASSWORD}" -o "${CF_ORG_NAME}" -s "${CF_SPACE_NAME}"
+
+                echo "Allowed IPs"
+                echo "${CONCOURSE_EGRESS_IPS}"
+
+                IFS="," read -ra IPS <<< "$CONCOURSE_EGRESS_IPS"
+
+                NGINX_ALLOW_STATEMENTS=""
+                for addr in "${IPS[@]}";
+                  do NGINX_ALLOW_STATEMENTS="$NGINX_ALLOW_STATEMENTS allow $addr/32;";
+                done;
+                echo "${NGINX_ALLOW_STATEMENTS}"
+
+                cd di-auth-oidc-provider/nginx
+
+                cf push --var app-name="selenium-route-service-app" --var allowed-ips="${NGINX_ALLOW_STATEMENTS}"
+
+                cf create-user-provided-service selenium-route-service -r https://selenium-route-service-app.london.cloudapps.digital
+                cf bind-route-service london.cloudapps.digital selenium-route-service --hostname selenium
+
       - task: test
         config:
           platform: linux
@@ -176,7 +243,7 @@ jobs:
           inputs:
             - name: di-auth-oidc-provider
           params:
-            SELENIUM_URL: https://selenium-firefox.london.cloudapps.digital/wd/hub
+            SELENIUM_URL: https://selenium.london.cloudapps.digital/wd/hub
             IDP_URL: https://di-auth-oidc-provider.london.cloudapps.digital
             RP_URL: https://di-auth-stub-relying-party.london.cloudapps.digital
           run:
