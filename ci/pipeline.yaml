@@ -117,6 +117,9 @@ jobs:
                 terraform apply -auto-approve ../../../terraform-plan/terraform.plan
 
   - name: deploy-app
+    serial: true
+    serial_groups:
+      - selenium-tests
     plan:
       - get: di-auth-oidc-provider
         trigger: true
