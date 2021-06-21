@@ -248,7 +248,7 @@ jobs:
           params:
             SELENIUM_URL: https://selenium.london.cloudapps.digital/wd/hub
             IDP_URL: https://di-auth-oidc-provider.london.cloudapps.digital
-            RP_URL: https://di-auth-stub-relying-party.london.cloudapps.digital
+            RP_URL: https://di-auth-stub-relying-party-sandbox.london.cloudapps.digital
           run:
             path: /bin/bash
             args:

@@ -61,8 +61,8 @@ services:
       OP_AUTHORIZE_URL: "http://di-auth-oidc-provider:8080/authorize"
       OP_TOKEN_URL: "http://di-auth-oidc-provider:8080/token"
       OP_USERINFO_URL: "http://di-auth-oidc-provider:8080/userinfo"
-      AUTH_CALLBACK_URL: "http://di-auth-stub-relying-party:8081/oidc/callback"
-      LOGOUT_URL: "http://di-auth-oidc-provider:8080/logout?redirectUri=http://di-auth-stub-relying-party:8081"
+      AUTH_CALLBACK_URL: "http://di-auth-stub-relying-party-sandbox:8081/oidc/callback"
+      LOGOUT_URL: "http://di-auth-oidc-provider:8080/logout?redirectUri=http://di-auth-stub-relying-party-sandbox:8081"
       RP_PORT: "8081"
     healthcheck:
       test: curl -L http://localhost:8081
