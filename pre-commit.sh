@@ -49,7 +49,7 @@ build_docker_service di-auth-stub-relying-party di-auth-oidc-provider
 start_docker_services di-auth-stub-relying-party di-auth-oidc-provider
 wait_for_docker_services di-auth-stub-relying-party di-auth-oidc-provider
 
-SELENIUM_URL="http://localhost:4444/wd/hub" IDP_URL="http://di-auth-oidc-provider:8080/" RP_URL="http://di-auth-stub-relying-party:8081/" ./gradlew cucumber
+SELENIUM_URL="http://localhost:4444/wd/hub" IDP_URL="http://di-auth-oidc-provider:8080/" RP_URL="http://di-auth-stub-relying-party-sandbox:8081/" ./gradlew cucumber
 build_and_test_exit_code=$?
 
 stop_docker_services op-db flyway selenium di-auth-stub-relying-party di-auth-oidc-provider
